@@ -47,7 +47,7 @@ public class Reservation implements Serializable {
     @JoinColumn(nullable = false)
     private Guest guest;
     
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Rate rate;
     
