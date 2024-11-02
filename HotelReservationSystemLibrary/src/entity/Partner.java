@@ -5,11 +5,14 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -47,6 +50,11 @@ public class Partner implements Serializable {
     @NotBlank
     @Pattern(regexp = "\\d+")
     private String mobileNumber;
+    
+    // Relationships
+    @OneToMany
+    private List<Guest> guests;
+    
 
     public Partner(String username, String password, String organisationName, String email, String mobileNumber) {
         this.username = username;
@@ -160,6 +168,20 @@ public class Partner implements Serializable {
      */
     public void setMobileNumber(String mobileNumber) {
         this.mobileNumber = mobileNumber;
+    }
+
+    /**
+     * @return the guests
+     */
+    public List<Guest> getGuests() {
+        return guests;
+    }
+
+    /**
+     * @param guests the guests to set
+     */
+    public void setGuests(List<Guest> guests) {
+        this.guests = guests;
     }
 
 }

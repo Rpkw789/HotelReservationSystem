@@ -11,6 +11,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -27,6 +29,15 @@ public class RoomAllocationExceptionRecord implements Serializable {
     @Column(nullable = false)
     @NotNull
     private Date date;
+    
+    // Relationships
+    @OneToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private Reservation affectedReservation;
+    
+    @OneToOne(optional = true)
+    @JoinColumn(nullable = true)
+    private Room givenRoom;
 
     public RoomAllocationExceptionRecord(Date date) {
         this.date = date;
@@ -81,6 +92,34 @@ public class RoomAllocationExceptionRecord implements Serializable {
      */
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    /**
+     * @return the affectedReservation
+     */
+    public Reservation getAffectedReservation() {
+        return affectedReservation;
+    }
+
+    /**
+     * @param affectedReservation the affectedReservation to set
+     */
+    public void setAffectedReservation(Reservation affectedReservation) {
+        this.affectedReservation = affectedReservation;
+    }
+
+    /**
+     * @return the givenRoom
+     */
+    public Room getGivenRoom() {
+        return givenRoom;
+    }
+
+    /**
+     * @param givenRoom the givenRoom to set
+     */
+    public void setGivenRoom(Room givenRoom) {
+        this.givenRoom = givenRoom;
     }
 
 }
