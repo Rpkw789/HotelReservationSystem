@@ -5,11 +5,13 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -26,33 +28,32 @@ public class Guest implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long guestId;
-    
     @NotBlank
     @Pattern(regexp = "^[A-Za-z0-9]*$")
     @Size(min = 5, max = 20)
     @Column(unique=true, nullable=false)
     private String username;
-    
     @NotBlank
     @Size(min = 5, max = 20)
     @Column(nullable=false)
     private String password;
-    
     @Email
     @Column(nullable = false, unique = true)
     @NotBlank
     private String email;
-    
     @Column(unique = true)
     @NotBlank
     @Pattern(regexp = "\\d+")
     private String mobileNumber;
-    
     @Column(unique = true, nullable=false)
     @NotBlank
     @Size(min = 9, max = 9)
     @Pattern(regexp = "^[A-Z0-9]{9}$")
     private String passportNumber;
+    
+    // Relationships
+    @OneToMany(mappedBy = "guest")
+    private List<Reservation> reservations;
 
     public Guest() {
     }
@@ -168,6 +169,20 @@ public class Guest implements Serializable {
      */
     public void setPassportNumber(String passportNumber) {
         this.passportNumber = passportNumber;
+    }
+
+    /**
+     * @return the reservations
+     */
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    /**
+     * @param reservations the reservations to set
+     */
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
     }
     
 }

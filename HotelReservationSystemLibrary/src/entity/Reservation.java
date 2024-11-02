@@ -11,6 +11,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -38,6 +41,22 @@ public class Reservation implements Serializable {
     @Column(nullable = false)
     @NotNull
     private Date checkOutDate;
+    
+    // Relationships
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private Guest guest;
+    
+    @OneToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private Rate rate;
+    
+    @OneToOne
+    private Room givenRoom;
+    
+    @OneToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private RoomType chosenRoomType;
 
     public Reservation() {
     }
@@ -137,6 +156,62 @@ public class Reservation implements Serializable {
      */
     public void setCheckOutDate(Date checkOutDate) {
         this.checkOutDate = checkOutDate;
+    }
+
+    /**
+     * @return the guest
+     */
+    public Guest getGuest() {
+        return guest;
+    }
+
+    /**
+     * @param guest the guest to set
+     */
+    public void setGuest(Guest guest) {
+        this.guest = guest;
+    }
+
+    /**
+     * @return the rate
+     */
+    public Rate getRate() {
+        return rate;
+    }
+
+    /**
+     * @param rate the rate to set
+     */
+    public void setRate(Rate rate) {
+        this.rate = rate;
+    }
+
+    /**
+     * @return the givenRoom
+     */
+    public Room getGivenRoom() {
+        return givenRoom;
+    }
+
+    /**
+     * @param givenRoom the givenRoom to set
+     */
+    public void setGivenRoom(Room givenRoom) {
+        this.givenRoom = givenRoom;
+    }
+
+    /**
+     * @return the chosenRoomType
+     */
+    public RoomType getChosenRoomType() {
+        return chosenRoomType;
+    }
+
+    /**
+     * @param chosenRoomType the chosenRoomType to set
+     */
+    public void setChosenRoomType(RoomType chosenRoomType) {
+        this.chosenRoomType = chosenRoomType;
     }
 
 }
