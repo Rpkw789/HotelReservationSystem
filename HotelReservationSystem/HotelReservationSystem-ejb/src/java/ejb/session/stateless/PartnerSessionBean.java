@@ -36,7 +36,7 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     @Override
     public boolean isUniqueUsername(String username) {
         TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(u) FROM User u WHERE u.username = :username", Long.class);
+                "SELECT COUNT(p) FROM Partner p WHERE p.username = :username", Long.class);
         query.setParameter("username", username);
 
         Long count = query.getSingleResult();
