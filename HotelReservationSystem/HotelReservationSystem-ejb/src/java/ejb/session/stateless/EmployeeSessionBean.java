@@ -39,7 +39,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     @Override
     public boolean isUniqueUsername(String username) {
         TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(u) FROM User u WHERE u.username = :username", Long.class);
+                "SELECT COUNT(e) FROM Employee e WHERE e.username = :username", Long.class);
         query.setParameter("username", username);
 
         Long count = query.getSingleResult();
@@ -48,7 +48,7 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
 
     @Override
     public Employee getEmployeeByUsername(String username) throws EmployeeNotFoundException {
-        Employee e = (Employee) em.createQuery("SELECT e FROM Employee WHERE e.username = :username")
+        Employee e = (Employee) em.createQuery("SELECT e FROM Employee e WHERE e.username = :username")
                 .setParameter("username", username)
                 .getSingleResult();
 
