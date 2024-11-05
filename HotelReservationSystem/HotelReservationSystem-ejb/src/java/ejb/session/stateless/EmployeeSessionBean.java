@@ -12,7 +12,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 import util.exception.EmployeeNotFoundException;
 import util.exception.EmployeeExistsException;
 
@@ -27,12 +26,12 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     private EntityManager em;
 
     @Override
-    public Employee createNewEmployee(Employee newEmployee) throws EmployeeExistsException {
+    public Long createNewEmployee(Employee newEmployee) throws EmployeeExistsException {
 
         if (isUniqueUsername(newEmployee.getUsername())) {
             em.persist(newEmployee);
             em.flush();
-            return newEmployee;
+            return newEmployee.getEmployeeId();
         } else {
             throw new EmployeeExistsException("Employee already exists!");
         }
@@ -41,12 +40,14 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
 
     @Override
     public boolean isUniqueUsername(String username) {
-        TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(e) FROM Employee e WHERE e.username = :username", Long.class);
+        Query query = em.createQuery("SELECT e FROM Employee e WHERE e.username = :username");
         query.setParameter("username", username);
-
-        Long count = query.getSingleResult();
-        return count < 0; //return true if no other username exists yet
+        try {
+            query.getSingleResult();
+            return false;
+        } catch (NoResultException ex) {
+            return true;
+        }
     }
 
     @Override

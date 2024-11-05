@@ -17,7 +17,7 @@ import util.exception.EmployeeNotFoundException;
 @Local
 public interface EmployeeSessionBeanLocal {
 
-    public Employee createNewEmployee(Employee newEmployee) throws EmployeeExistsException;
+    public Long createNewEmployee(Employee newEmployee) throws EmployeeExistsException;
 
     public Employee getEmployeeByUsername(String username) throws EmployeeNotFoundException;
 

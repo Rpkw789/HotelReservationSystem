@@ -26,11 +26,11 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     private EntityManager em;
 
     @Override
-    public Partner createNewPartner(Partner newPartner) throws PartnerExistsException{
+    public Long createNewPartner(Partner newPartner) throws PartnerExistsException{
         if (isUniqueUsername(newPartner.getUsername())){
             em.persist(newPartner);
             em.flush();
-            return newPartner;
+            return newPartner.getPartnerId();
         } else {
             throw new PartnerExistsException("Partner already exists!");
         }
@@ -50,12 +50,14 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     
     @Override
     public boolean isUniqueUsername(String username) {
-        TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(p) FROM Partner p WHERE p.username = :username", Long.class);
+        Query query = em.createQuery("SELECT p FROM Partner p WHERE p.username = :username");
         query.setParameter("username", username);
-
-        Long count = query.getSingleResult();
-        return count < 0;
+        try {
+            query.getSingleResult();
+            return false;
+        } catch (NoResultException ex) {
+            return true;
+        }
     }
     
     @Override

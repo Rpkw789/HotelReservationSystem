@@ -8,7 +8,9 @@ import entity.RoomType;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import util.exception.RoomTypeExistsException;
 import util.exception.RoomTypeNotFoundException;
@@ -24,13 +26,13 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
     private EntityManager em;
 
     @Override
-    public RoomType createRoomType(RoomType newRoomType) throws RoomTypeExistsException{
+    public Long createRoomType(RoomType newRoomType) throws RoomTypeExistsException{
         
         if (isUniqueName(newRoomType.getName())) {
             em.persist(newRoomType);
             em.flush();
         
-            return newRoomType;
+            return newRoomType.getRoomTypeId();
         }
         else {
             throw new RoomTypeExistsException("Room type already exists!");
@@ -39,12 +41,15 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
     
     @Override
     public boolean isUniqueName(String name) {
-        TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(r) FROM RoomType r WHERE r.name = :name", Long.class);
+        Query query = em.createQuery("SELECT r FROM RoomType r WHERE r.name = :name");
         query.setParameter("name", name);
-
-        Long count = query.getSingleResult();
-        return count < 0;
+        
+        try {
+            query.getSingleResult();
+            return false;
+        } catch(NoResultException ex) {
+            return true;
+        }
     }
 
     @Override

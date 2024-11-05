@@ -17,7 +17,7 @@ import util.exception.PartnerNotFoundException;
 @Local
 public interface PartnerSessionBeanLocal {
 
-    public Partner createNewPartner(Partner newPartner) throws PartnerExistsException;
+    public Long createNewPartner(Partner newPartner) throws PartnerExistsException;
     public boolean isUniqueUsername(String username);
     public List<Partner> getAllPartners();
 
