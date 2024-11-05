@@ -16,7 +16,7 @@ import util.exception.EmployeeNotFoundException;
  */
 @Remote
 public interface EmployeeSessionBeanRemote {
-    public Employee createNewEmployee(Employee newEmployee) throws EmployeeExistsException;
+    public Long createNewEmployee(Employee newEmployee) throws EmployeeExistsException;
     public Employee getEmployeeByUsername(String username) throws EmployeeNotFoundException;
     public boolean isUniqueUsername(String username);
     public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException;

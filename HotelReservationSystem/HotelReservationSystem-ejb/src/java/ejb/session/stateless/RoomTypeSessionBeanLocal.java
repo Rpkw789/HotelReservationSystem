@@ -19,7 +19,7 @@ public interface RoomTypeSessionBeanLocal {
 
     public boolean isUniqueName(String name);
 
-    public RoomType createRoomType(RoomType newRoomType) throws RoomTypeExistsException;
+    public Long createRoomType(RoomType newRoomType) throws RoomTypeExistsException;
 
     public void deleteRoomType(Long roomTypeId) throws RoomTypeNotFoundException;
 

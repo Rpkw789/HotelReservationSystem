@@ -17,7 +17,7 @@ import util.exception.PartnerNotFoundException;
 @Remote
 public interface PartnerSessionBeanRemote {
 
-    public Partner createNewPartner(Partner newPartner) throws PartnerExistsException;
+    public Long createNewPartner(Partner newPartner) throws PartnerExistsException;
 
     public boolean isUniqueUsername(String username);
 
