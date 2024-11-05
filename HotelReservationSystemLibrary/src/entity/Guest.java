@@ -28,14 +28,18 @@ public class Guest implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long guestId;
+    @Column(nullable = false)
+    @NotBlank
+    @Pattern(regexp = "^[A-Za-z0-9]*$")
+    private String name;
     @NotBlank
     @Pattern(regexp = "^[A-Za-z0-9]*$")
     @Size(min = 5, max = 20)
-    @Column(unique=true, nullable=false)
+    @Column(unique = true, nullable = false)
     private String username;
     @NotBlank
     @Size(min = 5, max = 20)
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String password;
     @Email
     @Column(nullable = false, unique = true)
@@ -45,12 +49,12 @@ public class Guest implements Serializable {
     @NotBlank
     @Pattern(regexp = "\\d+")
     private String mobileNumber;
-    @Column(unique = true, nullable=false)
+    @Column(unique = true, nullable = false)
     @NotBlank
     @Size(min = 9, max = 9)
     @Pattern(regexp = "^[A-Z0-9]{9}$")
     private String passportNumber;
-    
+
     // Relationships
     @OneToMany(mappedBy = "guest")
     private List<Reservation> reservations;
@@ -66,8 +70,6 @@ public class Guest implements Serializable {
         this.passportNumber = passportNumber;
     }
 
-    
-    
     public Long getGuestId() {
         return guestId;
     }
@@ -184,5 +186,19 @@ public class Guest implements Serializable {
     public void setReservations(List<Reservation> reservations) {
         this.reservations = reservations;
     }
-    
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
 }

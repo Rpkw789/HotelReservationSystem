@@ -8,7 +8,10 @@ import entity.Employee;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import util.exception.EmployeeNotFoundException;
 import util.exception.EmployeeExistsException;
@@ -48,28 +51,28 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
 
     @Override
     public Employee getEmployeeByUsername(String username) throws EmployeeNotFoundException {
-        Employee e = (Employee) em.createQuery("SELECT e FROM Employee e WHERE e.username = :username")
-                .setParameter("username", username)
-                .getSingleResult();
-
-        if (e == null) {
-            throw new EmployeeNotFoundException("Username does not exists!");
+        Query query = em.createQuery("SELECT e FROM Employee e WHERE e.username = :username");
+        query.setParameter("username", username);
+        try {
+            Employee employee = (Employee) query.getSingleResult();
+            return employee;
+        } catch (NoResultException ex) {
+            throw new EmployeeNotFoundException("Employee with username '" + username + "' not found");
         }
-        return e;
     }
-    
+
     @Override
     public void deleteEmployee(Long employeeId) throws EmployeeNotFoundException {
         Employee e = em.find(Employee.class, employeeId);
-        if (e==null) {
+        if (e == null) {
             throw new EmployeeNotFoundException("Employee does not exist");
         } else {
             em.remove(e);
         }
     }
-    
+
     @Override
-    public List<Employee> getAllEmployees(){
+    public List<Employee> getAllEmployees() {
         return em.createQuery("SELECT e FROM Employee e").getResultList();
     }
 
