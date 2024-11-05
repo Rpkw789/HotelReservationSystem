@@ -8,6 +8,7 @@ import entity.Partner;
 import java.util.List;
 import javax.ejb.Local;
 import util.exception.PartnerExistsException;
+import util.exception.PartnerNotFoundException;
 
 /**
  *
@@ -19,5 +20,7 @@ public interface PartnerSessionBeanLocal {
     public Partner createNewPartner(Partner newPartner) throws PartnerExistsException;
     public boolean isUniqueUsername(String username);
     public List<Partner> getAllPartners();
+
+    public Partner getPartnerByUsername(String username) throws PartnerNotFoundException;
     
 }

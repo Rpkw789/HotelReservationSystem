@@ -33,6 +33,10 @@ public class Employee implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long employeeId;
+    @Column(nullable = false)
+    @NotBlank
+    @Pattern(regexp = "^[A-Za-z0-9]*$")
+    private String name;
     @Column(unique = true, nullable = false)
     @NotBlank
     @Pattern(regexp = "^[A-Za-z0-9]*$")
@@ -50,10 +54,11 @@ public class Employee implements Serializable {
     public Employee() {
     }
 
-    public Employee(String username, String password) {
+    public Employee(String username, String password, String name) {
         this.username = username;
         this.password = password;
         this.employeeRoles = new ArrayList<EmployeeRoleEnum>();
+        this.name = name;
     }
 
     
@@ -129,6 +134,20 @@ public class Employee implements Serializable {
      */
     public void setEmployeeRoles(List<EmployeeRoleEnum> employeeRoles) {
         this.employeeRoles = employeeRoles;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

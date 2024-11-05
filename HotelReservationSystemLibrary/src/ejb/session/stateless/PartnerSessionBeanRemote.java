@@ -8,15 +8,20 @@ import entity.Partner;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.PartnerExistsException;
+import util.exception.PartnerNotFoundException;
 
 /**
  *
  * @author taniafoo
  */
-
 @Remote
 public interface PartnerSessionBeanRemote {
+
     public Partner createNewPartner(Partner newPartner) throws PartnerExistsException;
+
     public boolean isUniqueUsername(String username);
+
     public List<Partner> getAllPartners();
+
+    public Partner getPartnerByUsername(String username) throws PartnerNotFoundException;
 }

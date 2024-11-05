@@ -35,10 +35,8 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
         try {
             Guest guest = (Guest) query.getSingleResult();
             return guest;
-        } catch (NonUniqueResultException ex) {
-            throw new GuestNotFoundException("Guest with username '" + username + "' not found");
         } catch (NoResultException ex) {
-            throw new GuestNotFoundException("Multiple Guests with username '" + username + "' found");
+            throw new GuestNotFoundException("Guest with username '" + username + "' not found");
         }
     }
 
