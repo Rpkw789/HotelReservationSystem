@@ -4,11 +4,14 @@
  */
 package hotelreservationsystemreservationclient;
 
+import ejb.session.singleton.DailyRoomAllocationSessionBeanRemote;
 import ejb.session.stateless.CheckInOutSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.GuestSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
+import ejb.session.stateless.RoomAllocationSessionBeanRemote;
+import ejb.session.stateless.RoomAvailabilitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import javax.ejb.EJB;
 
@@ -18,6 +21,12 @@ import javax.ejb.EJB;
  */
 public class Main {
 
+    @EJB
+    private static RoomAvailabilitySessionBeanRemote roomAvailabilitySessionBean;
+    @EJB
+    private static DailyRoomAllocationSessionBeanRemote dailyRoomAllocationSessionBean;
+    @EJB
+    private static RoomAllocationSessionBeanRemote roomAllocationSessionBean;
     @EJB
     private static CheckInOutSessionBeanRemote checkInOutSessionBean;
     @EJB
@@ -30,10 +39,10 @@ public class Main {
     private static GuestSessionBeanRemote guestSessionBean;
     @EJB
     private static EmployeeSessionBeanRemote employeeSessionBean;
-
+    
     
     public static void main(String[] args) {
-        MainApp mainApp = new MainApp(checkInOutSessionBean, roomTypeSessionBean, reservationSessionBean, partnerSessionBean, guestSessionBean, employeeSessionBean);
+        MainApp mainApp = new MainApp(checkInOutSessionBean, roomTypeSessionBean, reservationSessionBean, partnerSessionBean, guestSessionBean, employeeSessionBean, dailyRoomAllocationSessionBean, roomAllocationSessionBean, roomAvailabilitySessionBean);
         mainApp.run();
     }
     

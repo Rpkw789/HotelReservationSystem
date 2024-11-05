@@ -8,9 +8,12 @@ import entity.Partner;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import util.exception.PartnerExistsException;
+import util.exception.PartnerNotFoundException;
 
 /**
  *
@@ -30,6 +33,18 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
             return newPartner;
         } else {
             throw new PartnerExistsException("Partner already exists!");
+        }
+    }
+    
+    public Partner getPartnerByUsername(String username) throws PartnerNotFoundException {
+        Query query = em.createQuery("SELECT p FROM Partner p WHERE p.username = :username");
+        query.setParameter("username", username);
+        
+        try {
+            Partner partner = (Partner) query.getSingleResult();
+            return partner;
+        } catch (NoResultException ex) {
+            throw new PartnerNotFoundException("Partner with username " + username + " not found");
         }
     }
     

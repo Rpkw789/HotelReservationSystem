@@ -4,9 +4,12 @@
  */
 package hotelreservationsystemreservationclient;
 
+import ejb.session.singleton.DailyRoomAllocationSessionBeanRemote;
 import ejb.session.stateless.CheckInOutSessionBeanRemote;
 import ejb.session.stateless.GuestSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
+import ejb.session.stateless.RoomAllocationSessionBeanRemote;
+import ejb.session.stateless.RoomAvailabilitySessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import entity.Employee;
 import java.util.ArrayList;
@@ -24,17 +27,23 @@ public class HotelOperationModule {
     private RoomTypeSessionBeanRemote roomTypeSessionBean;
     private ReservationSessionBeanRemote reservationSessionBean;
     private GuestSessionBeanRemote guestSessionBean;
+    private RoomAvailabilitySessionBeanRemote roomAvailabilitySessionBean;
+    private DailyRoomAllocationSessionBeanRemote dailyRoomAllocationSessionBean;
+    private RoomAllocationSessionBeanRemote roomAllocationSessionBean;
 
     private Employee employee;
 
     private List<InputNumberRolePair> inputNumberRolePairList;
 
-    public HotelOperationModule(CheckInOutSessionBeanRemote checkInOutSessionBean, RoomTypeSessionBeanRemote roomTypeSessionBean, ReservationSessionBeanRemote reservationSessionBean, GuestSessionBeanRemote guestSessionBean, Employee employee) {
+    public HotelOperationModule(CheckInOutSessionBeanRemote checkInOutSessionBean, RoomTypeSessionBeanRemote roomTypeSessionBean, ReservationSessionBeanRemote reservationSessionBean, GuestSessionBeanRemote guestSessionBean, Employee employee, DailyRoomAllocationSessionBeanRemote dailyRoomAllocationSessionBean, RoomAllocationSessionBeanRemote roomAllocationSessionBean, RoomAvailabilitySessionBeanRemote roomAvailabilitySessionBean) {
         this.checkInOutSessionBean = checkInOutSessionBean;
         this.roomTypeSessionBean = roomTypeSessionBean;
         this.reservationSessionBean = reservationSessionBean;
         this.guestSessionBean = guestSessionBean;
         this.employee = employee;
+        this.dailyRoomAllocationSessionBean = dailyRoomAllocationSessionBean;
+        this.roomAllocationSessionBean = roomAllocationSessionBean;
+        this.roomAvailabilitySessionBean = roomAvailabilitySessionBean;
 
         this.inputNumberRolePairList = new ArrayList<InputNumberRolePair>();
         for (EmployeeRoleEnum role : employee.getEmployeeRoles()) {
@@ -101,6 +110,7 @@ public class HotelOperationModule {
             counter++;
         }
         System.out.println(counter + ": Allocate Room to current day reservation");
+        System.out.println((counter + 1) + ": Exit");
         return counter;
     }
 
@@ -132,7 +142,7 @@ public class HotelOperationModule {
             System.out.println("*Others*");
             System.out.println("9: View Room Allocation Exception Report");
             System.out.println("10: Exit");
-            
+
             int response = scanner.nextInt();
             switch (response) {
                 case 1:
@@ -172,42 +182,43 @@ public class HotelOperationModule {
         }
 
     }
-    
+
     private void doCreateNewRoomType() {
         System.out.println("doCreateNewRoomType");
     }
-    
+
     private void doUpdateRoomType() {
         System.out.println("doUpdateRoomType");
     }
-    
+
     private void doDeleteRoomType() {
         System.out.println("doDeleteRoomType");
     }
-    
+
     private void doViewAllRoomTypes() {
         System.out.println("doViewAllRoomTypes");
     }
-    
+
     private void doCreateNewRoom() {
         System.out.println("doCreateNewRoom");
     }
-    
+
     private void doUpdateRoom() {
         System.out.println("doUpdateRoom");
     }
-    
+
     private void doDeleteRoom() {
         System.out.println("doDeleteRoom");
     }
-    
+
     private void doViewAllRooms() {
         System.out.println("doViewAllRooms");
     }
-    
+
     private void doViewRoomAllocationExceptionReport() {
         System.out.println("doViewRoomAllocationExceptionReport");
     }
+
     ///////////SALES OPERATION//////////////////////
     private void salesOperationMenu() {
         Scanner scanner = new Scanner(System.in);
@@ -219,7 +230,7 @@ public class HotelOperationModule {
             System.out.println("3: Delete Room Rate");
             System.out.println("4: View All Room Rates");
             System.out.println("5: Exit");
-            
+
             int response = scanner.nextInt();
             switch (response) {
                 case 1:
@@ -243,19 +254,19 @@ public class HotelOperationModule {
             }
         }
     }
-    
+
     private void doCreateNewRoomRate() {
         System.out.println("doCreateNewRoomRate");
     }
-    
+
     private void doUpdateRoomRate() {
         System.out.println("doUpdateRoomRate");
     }
-    
+
     private void doDeletRoomRate() {
         System.out.println("doDeleteRoomRate");
     }
-    
+
     private void doViewAllRoomRates() {
         System.out.println("doViewAlRoomRates");
     }
@@ -270,7 +281,7 @@ public class HotelOperationModule {
             System.out.println("2: Check-in Guest");
             System.out.println("3: Check-out Guest");
             System.out.println("4: Exit");
-            
+
             int response = scanner.nextInt();
             switch (response) {
                 case 1:
@@ -291,7 +302,7 @@ public class HotelOperationModule {
             }
         }
     }
-    
+
     private void doWalkInSearchReserveRoom() {
         System.out.println("doWalkInSearchReserveRoom");
     }
@@ -299,10 +310,11 @@ public class HotelOperationModule {
     private void doCheckInGuest() {
         System.out.println("doCheckInGuest");
     }
-    
+
     private void doCheckOutGuest() {
         System.out.println("doCheckOutGuest");
     }
+
     ///////////ALLOCATE ROOM TO CURRENT DAY RESERVATION/////////////
     private void doAllocateRoomToCurrentDayReservation() {
         System.out.println("TO-DO: doAllocateRoomToCurrentDayReservation");
