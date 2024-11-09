@@ -10,13 +10,19 @@ import ejb.session.stateless.GuestSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import ejb.session.stateless.RoomAllocationSessionBeanRemote;
 import ejb.session.stateless.RoomAvailabilitySessionBeanRemote;
+import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import entity.Employee;
+import entity.Room;
 import entity.RoomType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import util.enumeration.EmployeeRoleEnum;
+import util.enumeration.RoomAvailabilityStatusEnum;
+import util.enumeration.RoomOperationalStatusEnum;
+import util.exception.RoomExistsException;
+import util.exception.RoomNotFoundException;
 import util.exception.RoomTypeExistsException;
 import util.exception.RoomTypeNotFoundException;
 
@@ -33,12 +39,13 @@ public class HotelOperationModule {
     private RoomAvailabilitySessionBeanRemote roomAvailabilitySessionBean;
     private DailyRoomAllocationSessionBeanRemote dailyRoomAllocationSessionBean;
     private RoomAllocationSessionBeanRemote roomAllocationSessionBean;
+    private RoomSessionBeanRemote roomSessionBean;
 
     private Employee employee;
 
     private List<InputNumberRolePair> inputNumberRolePairList;
 
-    public HotelOperationModule(CheckInOutSessionBeanRemote checkInOutSessionBean, RoomTypeSessionBeanRemote roomTypeSessionBean, ReservationSessionBeanRemote reservationSessionBean, GuestSessionBeanRemote guestSessionBean, Employee employee, DailyRoomAllocationSessionBeanRemote dailyRoomAllocationSessionBean, RoomAllocationSessionBeanRemote roomAllocationSessionBean, RoomAvailabilitySessionBeanRemote roomAvailabilitySessionBean) {
+    public HotelOperationModule(CheckInOutSessionBeanRemote checkInOutSessionBean, RoomTypeSessionBeanRemote roomTypeSessionBean, ReservationSessionBeanRemote reservationSessionBean, GuestSessionBeanRemote guestSessionBean, Employee employee, DailyRoomAllocationSessionBeanRemote dailyRoomAllocationSessionBean, RoomAllocationSessionBeanRemote roomAllocationSessionBean, RoomAvailabilitySessionBeanRemote roomAvailabilitySessionBean, RoomSessionBeanRemote roomSessionBean) {
         this.checkInOutSessionBean = checkInOutSessionBean;
         this.roomTypeSessionBean = roomTypeSessionBean;
         this.reservationSessionBean = reservationSessionBean;
@@ -47,6 +54,7 @@ public class HotelOperationModule {
         this.dailyRoomAllocationSessionBean = dailyRoomAllocationSessionBean;
         this.roomAllocationSessionBean = roomAllocationSessionBean;
         this.roomAvailabilitySessionBean = roomAvailabilitySessionBean;
+        this.roomSessionBean = roomSessionBean;
 
         this.inputNumberRolePairList = new ArrayList<InputNumberRolePair>();
         for (EmployeeRoleEnum role : employee.getEmployeeRoles()) {
@@ -266,7 +274,7 @@ public class HotelOperationModule {
         RoomType roomType = roomTypes.get(response - 1);
         while (true) {
             System.out.println("");
-            System.out.println("Choose an attribute to ");
+            System.out.println("Choose an attribute to update");
             System.out.println("RoomType - " + roomType.getRoomTypeId());
             System.out.println("1: Name: " + roomType.getName());
             System.out.println("2: Description: " + roomType.getDescription());
@@ -320,6 +328,7 @@ public class HotelOperationModule {
 
         try {
             roomTypeSessionBean.updateRoomType(roomType);
+            System.out.println("Room Type updated");
         } catch (RoomTypeNotFoundException ex) {
             System.out.println("Error: " + ex.getMessage());
         }
@@ -364,12 +373,20 @@ public class HotelOperationModule {
             System.out.println("Capacity: " + roomType.getCapacity());
             String amenities = roomType.getAmenities().toString();
             System.out.println("Amenities: " + amenities.substring(1, amenities.length() - 1));
+            System.out.println("Status: " + (roomType.isEnabled() ? "Enabled" : "Disabled"));
             while (true) {
-                System.out.println("Remove this Room Type? (y/n)");
+                System.out.println("Remove/Disabled this Room Type? (y/n)");
                 String reply = scanner.nextLine().trim().toLowerCase();
                 if (reply.equals("y")) {
                     try {
-                        roomTypeSessionBean.deleteRoomType(roomType.getRoomTypeId());
+                        if (roomType.getRooms().isEmpty()) {
+                            System.out.println(roomType.getRooms());
+                            roomTypeSessionBean.deleteRoomType(roomType.getRoomTypeId());
+                        } else {
+                            roomType.setEnabled(false);
+                            roomTypeSessionBean.updateRoomType(roomType);
+                        }
+
                     } catch (RoomTypeNotFoundException ex) {
                         System.out.println("Error: " + ex.getMessage());
                     }
@@ -423,19 +440,197 @@ public class HotelOperationModule {
     }
 
     private void doCreateNewRoom() {
-        System.out.println("doCreateNewRoom");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("");
+        System.out.println("*Create New Room*");
+        String roomNumber = "";
+        List<RoomType> roomTypes = roomTypeSessionBean.getAllRoomType();
+        List<RoomType> filteredRoomTypes = new ArrayList<RoomType>();
+        roomTypes.stream().filter(roomType -> roomType.isEnabled()).forEach(x -> filteredRoomTypes.add(x));
+        if (filteredRoomTypes.isEmpty()) {
+            System.out.println("No Room Type available. Create Room Type first");
+            return;
+        }
+        while (true) {
+            System.out.print("Room Number > ");
+            roomNumber = scanner.nextLine().trim();
+
+            if (roomSessionBean.isUniqueRoomNumber(roomNumber)) {
+                break;
+            } else {
+                System.out.println("Error: Room Number taken. Enter another name");
+            }
+        }
+        System.out.println("Choose Room Type");
+        for (int i = 0; i < filteredRoomTypes.size(); i++) {
+            System.out.println((i + 1) + ": " + filteredRoomTypes.get(i).getName());
+        }
+        int response = scanner.nextInt();
+        scanner.nextLine();
+
+        Long chosenRoomTypeId = filteredRoomTypes.get(response - 1).getRoomTypeId();
+        Room room = new Room(roomNumber);
+
+        try {
+            Long roomId = roomSessionBean.createNewRoom(room, chosenRoomTypeId);
+            System.out.println("Room created with Room Type ID: " + roomId);
+        } catch (RoomExistsException ex) {
+            System.out.println("Error: " + ex.getMessage());
+        }
     }
 
     private void doUpdateRoom() {
-        System.out.println("doUpdateRoom");
+        Scanner scanner = new Scanner(System.in);
+        List<RoomType> roomTypes = roomTypeSessionBean.getAllRoomType();
+        List<RoomType> filteredRoomTypes = new ArrayList<RoomType>();
+        roomTypes.stream().filter(roomType -> roomType.isEnabled()).forEach(x -> filteredRoomTypes.add(x));
+        while (true) {
+            System.out.println("*Update Room*");
+            System.out.println("To Exit, type 'q'");
+            System.out.print("Room Number > ");
+            String roomNumber = scanner.nextLine().trim();
+            if (roomNumber.equals("q")) {
+                return;
+            }
+
+            try {
+                Room room = roomSessionBean.getRoomByRoomNumber(roomNumber);
+                while (true) {
+                    System.out.println("Choose an attribute to update");
+                    System.out.println("1: Room Number: " + room.getRoomNumber());
+                    System.out.println("2: Room Type: " + room.getRoomType().getName());
+                    System.out.println("3: Room Availability Status: " + room.getAvailabilityStatus());
+                    System.out.println("4: Room Operational Status: " + room.getOperationalStatus());
+                    System.out.println("5: Done");
+                    System.out.println("6: Exit");
+                    int response = scanner.nextInt();
+                    scanner.nextLine();
+
+                    if (response == 1) {
+                        System.out.print("New Room Number > ");
+                        room.setRoomNumber(scanner.nextLine().trim());
+                    } else if (response == 2) {
+                        System.out.println("Select Room Type");
+                        for (int i = 0; i < roomTypes.size(); i++) {
+                            System.out.println((i + 1) + ": " + filteredRoomTypes.get(i).getName());
+                        }
+                        int newRoomType = scanner.nextInt() - 1;
+                        scanner.nextLine();
+                        room.setRoomType(filteredRoomTypes.get(newRoomType));
+                    } else if (response == 3) {
+                        System.out.println("Select Room Availability Status");
+                        System.out.println("1: Available");
+                        System.out.println("2: Not Available");
+                        int availability = scanner.nextInt();
+                        scanner.nextLine();
+                        if (availability == 1) {
+                            room.setAvailabilityStatus(RoomAvailabilityStatusEnum.AVAILABLE);
+                        } else if (availability == 2) {
+                            room.setAvailabilityStatus(RoomAvailabilityStatusEnum.NOT_AVAILABLE);
+                        }
+                    } else if (response == 4) {
+                        System.out.println("Select Room Availability Status");
+                        System.out.println("1: Enabled");
+                        System.out.println("2: Disabled");
+                        int availability = scanner.nextInt();
+                        scanner.nextLine();
+                        if (availability == 1) {
+                            room.setOperationalStatus(RoomOperationalStatusEnum.ENABLED);
+                        } else if (availability == 2) {
+                            room.setOperationalStatus(RoomOperationalStatusEnum.DISABLED);
+                        }
+                    } else if (response == 5) {
+                        try {
+                            roomSessionBean.updateRoom(room);
+                            System.out.println("Room updated");
+                            return;
+                        } catch (RoomNotFoundException ex) {
+                            System.out.println("Error: " + ex.getMessage());
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+            } catch (RoomNotFoundException ex) {
+                System.out.println("Error: " + ex.getMessage());
+                System.out.println("Input Room Number Again");
+                continue;
+            }
+
+        }
     }
 
     private void doDeleteRoom() {
-        System.out.println("doDeleteRoom");
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("*Delete Room*");
+            System.out.println("To Exit, type 'q'");
+            System.out.print("Room Number > ");
+            String roomNumber = scanner.nextLine().trim();
+            if (roomNumber.equals("q")) {
+                return;
+            }
+
+            try {
+                Room room = roomSessionBean.getRoomByRoomNumber(roomNumber);
+                System.out.println("Room Number: " + room.getRoomNumber());
+                System.out.println("Room Type: " + room.getRoomType().getName());
+                System.out.println("Room Availability Status: " + room.getAvailabilityStatus());
+                System.out.println("Room Operational Status: " + room.getOperationalStatus());
+
+                System.out.print("Remove / Disable this Room? (y/n) > ");
+                String response = scanner.nextLine().trim();
+                if (response.equals("y")) {
+                    // TO-DO : Disable feature
+                    roomSessionBean.deleteRoom(room.getRoomId());
+                    System.out.println("Room " + room.getRoomNumber() + " deleted");
+                } else {
+                    continue;
+                }
+            } catch (RoomNotFoundException ex) {
+                System.out.println("Error: " + ex.getMessage());
+                System.out.println("Input Room Number Again");
+                continue;
+            }
+
+        }
     }
 
     private void doViewAllRooms() {
-        System.out.println("doViewAllRooms");
+        Scanner scanner = new Scanner(System.in);
+        List<Room> rooms = roomSessionBean.getAllRooms();
+
+        while (true) {
+            System.out.println("");
+            System.out.println("*View All Room*");
+            int size = rooms.size();
+            int exit = size + 1;
+
+            for (int i = 0; i < size; i++) {
+                System.out.println((i + 1) + ": " + rooms.get(i).getRoomNumber());
+            }
+            System.out.println((size + 1) + ": Exit");
+            System.out.println("Select a Room to view / Exit");
+            int response = scanner.nextInt();
+
+            if (response == exit) {
+                break;
+            }
+
+            if (response <= 0 || response > exit) {
+                System.out.println("");
+                System.out.println("Error: Enter input again");
+                continue;
+            }
+
+            Room room = rooms.get(response - 1);
+            System.out.println("Room Number: " + room.getRoomNumber());
+            System.out.println("Room Type: " + room.getRoomType().getName());
+            System.out.println("Room Availability Status: " + room.getAvailabilityStatus());
+            System.out.println("Room Operational Status: " + room.getOperationalStatus());
+        }
     }
 
     private void doViewRoomAllocationExceptionReport() {

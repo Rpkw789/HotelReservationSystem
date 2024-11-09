@@ -16,7 +16,7 @@ import util.exception.RoomNotFoundException;
  */
 @Remote
 public interface RoomSessionBeanRemote {
-    public Room createNewRoom(Room newRoom, Long roomTypeId) throws RoomExistsException;
+    public Long createNewRoom(Room newRoom, Long roomTypeId) throws RoomExistsException;
     public boolean isUniqueRoomNumber(String roomNumber);
     public Room updateRoom(Room updatedRoom) throws RoomNotFoundException;
     public void deleteRoom(Long roomId) throws RoomNotFoundException;

@@ -17,7 +17,7 @@ import util.exception.RoomNotFoundException;
 @Local
 public interface RoomSessionBeanLocal {
 
-    public Room createNewRoom(Room newRoom, Long roomTypeId) throws RoomExistsException;
+    public Long createNewRoom(Room newRoom, Long roomTypeId) throws RoomExistsException;
 
     public boolean isUniqueRoomNumber(String roomNumber);
 

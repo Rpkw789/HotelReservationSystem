@@ -77,6 +77,10 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
     
     @Override
     public List<RoomType> getAllRoomType() {
-        return em.createQuery("SELECT r FROM RoomType r").getResultList();
+        List<RoomType> roomTypes = em.createQuery("SELECT r FROM RoomType r").getResultList();
+        for (RoomType rt : roomTypes) {
+            rt.getRooms().size();
+        }
+        return roomTypes;
     }
 }
