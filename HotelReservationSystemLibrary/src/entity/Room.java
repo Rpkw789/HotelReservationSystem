@@ -11,10 +11,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import util.enumeration.RoomAvailabilityStatusEnum;
+import util.enumeration.RoomOperationalStatusEnum;
 
 /**
  *
@@ -34,22 +37,25 @@ public class Room implements Serializable {
     private String roomNumber;
     @NotNull
     @Column(nullable=false)
-    private boolean status;
+    private RoomAvailabilityStatusEnum availabilityStatus;
+    @Column(nullable=false)
+    private RoomOperationalStatusEnum operationalStatus;
     
     // Relationships
     @OneToOne(mappedBy = "givenRoom", optional = true)
     private Reservation reservation;
     
-    @OneToOne(optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private RoomType roomType;
 
     public Room() {
     }
 
-    public Room(String roomNumber, boolean status) {
+    public Room(String roomNumber) {
         this.roomNumber = roomNumber;
-        this.status = true;
+        this.availabilityStatus = RoomAvailabilityStatusEnum.AVAILABLE;
+        this.operationalStatus = RoomOperationalStatusEnum.ENABLED;
     }
 
     
@@ -102,20 +108,6 @@ public class Room implements Serializable {
     }
 
     /**
-     * @return the status
-     */
-    public boolean isStatus() {
-        return status;
-    }
-
-    /**
-     * @param status the status to set
-     */
-    public void setStatus(boolean status) {
-        this.status = status;
-    }
-
-    /**
      * @return the reservation
      */
     public Reservation getReservation() {
@@ -142,5 +134,34 @@ public class Room implements Serializable {
     public void setRoomType(RoomType roomType) {
         this.roomType = roomType;
     }
+
+    /**
+     * @return the availabilityStatus
+     */
+    public RoomAvailabilityStatusEnum getAvailabilityStatus() {
+        return availabilityStatus;
+    }
+
+    /**
+     * @param availabilityStatus the availabilityStatus to set
+     */
+    public void setAvailabilityStatus(RoomAvailabilityStatusEnum availabilityStatus) {
+        this.availabilityStatus = availabilityStatus;
+    }
+
+    /**
+     * @return the operationalStatus
+     */
+    public RoomOperationalStatusEnum getOperationalStatus() {
+        return operationalStatus;
+    }
+
+    /**
+     * @param operationalStatus the operationalStatus to set
+     */
+    public void setOperationalStatus(RoomOperationalStatusEnum operationalStatus) {
+        this.operationalStatus = operationalStatus;
+    }
+
     
 }

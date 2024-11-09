@@ -12,6 +12,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -52,6 +53,11 @@ public class RoomType implements Serializable {
     @NotNull
     @Column(nullable=false)
     private List amenities;
+    
+    @OneToMany(mappedBy = "roomType")
+    private List<Room> rooms;
+    
+    private boolean enabled = true;
 
     public RoomType() {
     }
@@ -63,6 +69,7 @@ public class RoomType implements Serializable {
         this.bed = bed;
         this.capacity = capacity;
         this.amenities = new ArrayList<String>();
+        this.rooms = new ArrayList<Room>();
     }
     
     
@@ -182,6 +189,34 @@ public class RoomType implements Serializable {
      */
     public void setAmenities(List amenities) {
         this.amenities = amenities;
+    }
+
+    /**
+     * @return the enabled
+     */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /**
+     * @param enabled the enabled to set
+     */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    /**
+     * @return the rooms
+     */
+    public List<Room> getRooms() {
+        return rooms;
+    }
+
+    /**
+     * @param rooms the rooms to set
+     */
+    public void setRooms(List<Room> rooms) {
+        this.rooms = rooms;
     }
 
 }
