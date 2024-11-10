@@ -55,6 +55,9 @@ public class RoomType implements Serializable {
     private List amenities;
     
     @OneToMany(mappedBy = "roomType")
+    private List<Rate> rates;
+    
+    @OneToMany(mappedBy = "roomType")
     private List<Room> rooms;
     
     private boolean enabled = true;
@@ -70,6 +73,7 @@ public class RoomType implements Serializable {
         this.capacity = capacity;
         this.amenities = new ArrayList<String>();
         this.rooms = new ArrayList<Room>();
+        this.rates = new ArrayList<Rate>();
     }
     
     
@@ -217,6 +221,20 @@ public class RoomType implements Serializable {
      */
     public void setRooms(List<Room> rooms) {
         this.rooms = rooms;
+    }
+
+    /**
+     * @return the rates
+     */
+    public List<Rate> getRates() {
+        return rates;
+    }
+
+    /**
+     * @param rates the rates to set
+     */
+    public void setRates(List<Rate> rates) {
+        this.rates = rates;
     }
 
 }

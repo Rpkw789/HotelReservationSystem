@@ -16,9 +16,16 @@ import util.exception.RateNotFoundException;
  */
 @Remote
 public interface RateSessionBeanRemote {
-    public Rate createNewRate(Rate newRate) throws RateExistsException;
+
+    public Long createNewRate(Rate newRate) throws RateExistsException;
+
     public boolean isUniqueRateName(String name);
-    public Rate updateRate(Rate updatedRate) throws RateNotFoundException;
+
+    public void updateRate(Rate updatedRate) throws RateNotFoundException;
+
     public void deleteRate(Long rateId) throws RateNotFoundException;
+
     public List<Rate> getAllRates();
+
+    public Rate getRateByName(String name) throws RateNotFoundException;
 }

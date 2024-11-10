@@ -17,14 +17,16 @@ import util.exception.RateNotFoundException;
 @Local
 public interface RateSessionBeanLocal {
 
-    public Rate createNewRate(Rate newRate) throws RateExistsException;
+    public Long createNewRate(Rate newRate) throws RateExistsException;
 
     public boolean isUniqueRateName(String name);
 
-    public Rate updateRate(Rate updatedRate) throws RateNotFoundException;
+    public void updateRate(Rate updatedRate) throws RateNotFoundException;
 
     public void deleteRate(Long rateId) throws RateNotFoundException;
 
     public List<Rate> getAllRates();
+
+    public Rate getRateByName(String rateId) throws RateNotFoundException;
     
 }

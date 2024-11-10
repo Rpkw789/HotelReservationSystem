@@ -8,7 +8,7 @@ package util.enumeration;
  *
  * @author ranen
  */
-public enum RoomOperationalStatusEnum {
+public enum OperationalStatusEnum {
     ENABLED,
     DISABLED
 }
