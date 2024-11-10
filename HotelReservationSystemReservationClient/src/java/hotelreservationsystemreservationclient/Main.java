@@ -9,6 +9,7 @@ import ejb.session.stateless.CheckInOutSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.GuestSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
+import ejb.session.stateless.RateSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import ejb.session.stateless.RoomAllocationSessionBeanRemote;
 import ejb.session.stateless.RoomAvailabilitySessionBeanRemote;
@@ -22,6 +23,8 @@ import javax.ejb.EJB;
  */
 public class Main {
 
+    @EJB
+    private static RateSessionBeanRemote rateSessionBean;
     @EJB
     private static RoomSessionBeanRemote roomSessionBean;
     @EJB
@@ -45,7 +48,7 @@ public class Main {
     
     
     public static void main(String[] args) {
-        MainApp mainApp = new MainApp(checkInOutSessionBean, roomTypeSessionBean, reservationSessionBean, partnerSessionBean, guestSessionBean, employeeSessionBean, dailyRoomAllocationSessionBean, roomAllocationSessionBean, roomAvailabilitySessionBean, roomSessionBean);
+        MainApp mainApp = new MainApp(checkInOutSessionBean, roomTypeSessionBean, reservationSessionBean, partnerSessionBean, guestSessionBean, employeeSessionBean, dailyRoomAllocationSessionBean, roomAllocationSessionBean, roomAvailabilitySessionBean, roomSessionBean, rateSessionBean);
         mainApp.run();
     }
     

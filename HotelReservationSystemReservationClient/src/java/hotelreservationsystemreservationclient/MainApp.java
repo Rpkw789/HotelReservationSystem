@@ -9,6 +9,7 @@ import ejb.session.stateless.CheckInOutSessionBeanRemote;
 import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.GuestSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
+import ejb.session.stateless.RateSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import ejb.session.stateless.RoomAllocationSessionBeanRemote;
 import ejb.session.stateless.RoomAvailabilitySessionBeanRemote;
@@ -38,13 +39,14 @@ public class MainApp {
     private DailyRoomAllocationSessionBeanRemote dailyRoomAllocationSessionBean;
     private RoomAllocationSessionBeanRemote roomAllocationSessionBean;
     private RoomSessionBeanRemote roomSessionBean;
+    private RateSessionBeanRemote rateSessionBean;
 
     private Employee employee;
    
     private HotelOperationModule hotelOperationModule;
     private SystemAdministrationModule systemAdministrationModule;
 
-    public MainApp(CheckInOutSessionBeanRemote checkInOutSessionBean, RoomTypeSessionBeanRemote roomTypeSessionBean, ReservationSessionBeanRemote reservationSessionBean, PartnerSessionBeanRemote partnerSessionBean, GuestSessionBeanRemote guestSessionBean, EmployeeSessionBeanRemote employeeSessionBean, DailyRoomAllocationSessionBeanRemote dailyRoomAllocationSessionBean, RoomAllocationSessionBeanRemote roomAllocationSessionBean, RoomAvailabilitySessionBeanRemote roomAvailabilitySessionBean, RoomSessionBeanRemote roomSessionBean) {
+    public MainApp(CheckInOutSessionBeanRemote checkInOutSessionBean, RoomTypeSessionBeanRemote roomTypeSessionBean, ReservationSessionBeanRemote reservationSessionBean, PartnerSessionBeanRemote partnerSessionBean, GuestSessionBeanRemote guestSessionBean, EmployeeSessionBeanRemote employeeSessionBean, DailyRoomAllocationSessionBeanRemote dailyRoomAllocationSessionBean, RoomAllocationSessionBeanRemote roomAllocationSessionBean, RoomAvailabilitySessionBeanRemote roomAvailabilitySessionBean, RoomSessionBeanRemote roomSessionBean, RateSessionBeanRemote rateSessionBean) {
         this.checkInOutSessionBean = checkInOutSessionBean;
         this.roomTypeSessionBean = roomTypeSessionBean;
         this.reservationSessionBean = reservationSessionBean;
@@ -55,6 +57,7 @@ public class MainApp {
         this.roomAllocationSessionBean = roomAllocationSessionBean;
         this.roomAvailabilitySessionBean = roomAvailabilitySessionBean;
         this.roomSessionBean = roomSessionBean;
+        this.rateSessionBean = rateSessionBean;
     }
 
     public void run() {
@@ -71,7 +74,7 @@ public class MainApp {
             if (response == 1) {
                 try {
                     doLogIn();
-                    hotelOperationModule = new HotelOperationModule(checkInOutSessionBean, roomTypeSessionBean, reservationSessionBean, guestSessionBean, employee, dailyRoomAllocationSessionBean, roomAllocationSessionBean, roomAvailabilitySessionBean, roomSessionBean);
+                    hotelOperationModule = new HotelOperationModule(checkInOutSessionBean, roomTypeSessionBean, reservationSessionBean, guestSessionBean, employee, dailyRoomAllocationSessionBean, roomAllocationSessionBean, roomAvailabilitySessionBean, roomSessionBean, rateSessionBean);
                     systemAdministrationModule = new SystemAdministrationModule(employeeSessionBean, partnerSessionBean, employee);
                     mainMenu();
                 } catch (InvalidCredentialException ex) {

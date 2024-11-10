@@ -5,7 +5,10 @@
 package entity;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,9 +16,13 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.validation.constraints.Future;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
+import util.enumeration.OperationalStatusEnum;
 import util.enumeration.RateTypeEnum;
 
 /**
@@ -42,22 +49,29 @@ public class Rate implements Serializable {
     @Enumerated(EnumType.STRING)
     private RateTypeEnum rateType;
     
-    @NotNull
-    @Column(nullable=false)
-    private Date validityStart;
-    @NotNull
-    @Column(nullable=false)
-    private Date validityEnd;
+    @ManyToOne(optional = false)
+    @JoinColumn(nullable = false)
+    private RoomType roomType;
+    
+    @Column(nullable=true)
+    private LocalDate validityStart;
+    @Column(nullable=true)
+    private LocalDate validityEnd;
+    
+    @Column(nullable = false)
+    private OperationalStatusEnum operationalStatus = OperationalStatusEnum.ENABLED;
+    
+    @OneToMany(mappedBy = "rate")
+    private List<Reservation> reservations = new ArrayList<Reservation>();
 
     public Rate() {
     }
 
-    public Rate(String name, double ratePerNight, RateTypeEnum rateType, Date validityStart, Date validityEnd) {
+    public Rate(String name, double ratePerNight, RateTypeEnum rateType, RoomType roomType) {
         this.name = name;
         this.ratePerNight = ratePerNight;
         this.rateType = rateType;
-        this.validityStart = validityStart;
-        this.validityEnd = validityEnd;
+        this.roomType = roomType;
     }
     
 
@@ -140,29 +154,71 @@ public class Rate implements Serializable {
     /**
      * @return the validityStart
      */
-    public Date getValidityStart() {
+    public LocalDate getValidityStart() {
         return validityStart;
     }
 
     /**
      * @param validityStart the validityStart to set
      */
-    public void setValidityStart(Date validityStart) {
+    public void setValidityStart(LocalDate validityStart) {
         this.validityStart = validityStart;
     }
 
     /**
      * @return the validityEnd
      */
-    public Date getValidityEnd() {
+    public LocalDate getValidityEnd() {
         return validityEnd;
     }
 
     /**
      * @param validityEnd the validityEnd to set
      */
-    public void setValidityEnd(Date validityEnd) {
+    public void setValidityEnd(LocalDate validityEnd) {
         this.validityEnd = validityEnd;
+    }
+
+    /**
+     * @return the roomType
+     */
+    public RoomType getRoomType() {
+        return roomType;
+    }
+
+    /**
+     * @param roomType the roomType to set
+     */
+    public void setRoomType(RoomType roomType) {
+        this.roomType = roomType;
+    }
+
+    /**
+     * @return the operationalStatus
+     */
+    public OperationalStatusEnum getOperationalStatus() {
+        return operationalStatus;
+    }
+
+    /**
+     * @param operationalStatus the operationalStatus to set
+     */
+    public void setOperationalStatus(OperationalStatusEnum operationalStatus) {
+        this.operationalStatus = operationalStatus;
+    }
+
+    /**
+     * @return the reservations
+     */
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    /**
+     * @param reservations the reservations to set
+     */
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
     }
     
 }

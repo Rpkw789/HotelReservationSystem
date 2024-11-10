@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import util.enumeration.RoomAvailabilityStatusEnum;
-import util.enumeration.RoomOperationalStatusEnum;
+import util.enumeration.OperationalStatusEnum;
 
 /**
  *
@@ -39,7 +39,7 @@ public class Room implements Serializable {
     @Column(nullable=false)
     private RoomAvailabilityStatusEnum availabilityStatus;
     @Column(nullable=false)
-    private RoomOperationalStatusEnum operationalStatus;
+    private OperationalStatusEnum operationalStatus;
     
     // Relationships
     @OneToOne(mappedBy = "givenRoom", optional = true)
@@ -55,7 +55,7 @@ public class Room implements Serializable {
     public Room(String roomNumber) {
         this.roomNumber = roomNumber;
         this.availabilityStatus = RoomAvailabilityStatusEnum.AVAILABLE;
-        this.operationalStatus = RoomOperationalStatusEnum.ENABLED;
+        this.operationalStatus = OperationalStatusEnum.ENABLED;
     }
 
     
@@ -152,14 +152,14 @@ public class Room implements Serializable {
     /**
      * @return the operationalStatus
      */
-    public RoomOperationalStatusEnum getOperationalStatus() {
+    public OperationalStatusEnum getOperationalStatus() {
         return operationalStatus;
     }
 
     /**
      * @param operationalStatus the operationalStatus to set
      */
-    public void setOperationalStatus(RoomOperationalStatusEnum operationalStatus) {
+    public void setOperationalStatus(OperationalStatusEnum operationalStatus) {
         this.operationalStatus = operationalStatus;
     }
 
