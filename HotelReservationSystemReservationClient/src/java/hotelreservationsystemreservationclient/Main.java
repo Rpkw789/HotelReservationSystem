@@ -22,34 +22,9 @@ import javax.ejb.EJB;
  * @author ranen
  */
 public class Main {
-
-    @EJB
-    private static RateSessionBeanRemote rateSessionBean;
-    @EJB
-    private static RoomSessionBeanRemote roomSessionBean;
-    @EJB
-    private static RoomAvailabilitySessionBeanRemote roomAvailabilitySessionBean;
-    @EJB
-    private static DailyRoomAllocationSessionBeanRemote dailyRoomAllocationSessionBean;
-    @EJB
-    private static RoomAllocationSessionBeanRemote roomAllocationSessionBean;
-    @EJB
-    private static CheckInOutSessionBeanRemote checkInOutSessionBean;
-    @EJB
-    private static RoomTypeSessionBeanRemote roomTypeSessionBean;
-    @EJB
-    private static ReservationSessionBeanRemote reservationSessionBean;
-    @EJB
-    private static PartnerSessionBeanRemote partnerSessionBean;
-    @EJB
-    private static GuestSessionBeanRemote guestSessionBean;
-    @EJB
-    private static EmployeeSessionBeanRemote employeeSessionBean;
     
     
     public static void main(String[] args) {
-        MainApp mainApp = new MainApp(checkInOutSessionBean, roomTypeSessionBean, reservationSessionBean, partnerSessionBean, guestSessionBean, employeeSessionBean, dailyRoomAllocationSessionBean, roomAllocationSessionBean, roomAvailabilitySessionBean, roomSessionBean, rateSessionBean);
-        mainApp.run();
     }
     
 }

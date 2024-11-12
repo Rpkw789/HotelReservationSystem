@@ -7,6 +7,9 @@ package ejb.session.singleton;
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import entity.Employee;
 import entity.Partner;
+import entity.Reservation;
+import java.time.LocalDate;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
@@ -45,6 +48,11 @@ public class DataInitialisationSessionBean {
         } catch (NoResultException ex) {
             partnerDataInitialisation();
         }
+        Query query = em.createQuery("SELECT r FROM Reservation r");
+        List<Reservation> list = query.getResultList();
+        if(list.isEmpty()) {
+            reservationDataInitialisation();
+        }
     }
 
     private void employeeDataInitialisation() {
@@ -55,9 +63,15 @@ public class DataInitialisationSessionBean {
         employee.getEmployeeRoles().add(EmployeeRoleEnum.OPERATION_MANAGER);
         employee.getEmployeeRoles().add(EmployeeRoleEnum.SALES_MANAGER);
     }
-    
+
     private void partnerDataInitialisation() {
         Partner partner = new Partner("username", "password", "Holiday", "holiday@gmail.com", "62248440");
         em.persist(partner);
+    }
+
+    private void reservationDataInitialisation() {
+        em.persist(new Reservation(1, 20, false, LocalDate.parse("2024-06-12"), LocalDate.parse("2024-06-15")));
+        em.persist(new Reservation(1, 20, false, LocalDate.parse("2024-06-10"), LocalDate.parse("2024-06-13")));
+        em.persist(new Reservation(1, 20, false, LocalDate.parse("2024-06-14"), LocalDate.parse("2024-06-17")));
     }
 }

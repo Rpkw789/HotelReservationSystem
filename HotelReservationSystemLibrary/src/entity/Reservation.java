@@ -5,7 +5,10 @@
 package entity;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,7 +16,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -37,10 +42,14 @@ public class Reservation implements Serializable {
     private boolean checkedIn;
     @Column(nullable = false)
     @NotNull
-    private Date checkInDate;
+    private LocalDate checkInDate;
     @Column(nullable = false)
     @NotNull
-    private Date checkOutDate;
+    private LocalDate checkOutDate;
+    @Column(nullable = false)
+    @NotNull
+    @Min(1)
+    private int numberOfRooms;
     
     // Relationships
     @ManyToOne(optional = false)
@@ -51,8 +60,8 @@ public class Reservation implements Serializable {
     @JoinColumn(nullable = false)
     private Rate rate;
     
-    @OneToOne
-    private Room givenRoom;
+    @OneToMany(mappedBy = "reservation")
+    private List<Room> givenRooms;
     
     @OneToOne(optional = false)
     @JoinColumn(nullable = false)
@@ -61,14 +70,16 @@ public class Reservation implements Serializable {
     public Reservation() {
     }
 
-    public Reservation(double fee, boolean checkedIn, Date checkInDate, Date checkOutDate) {
+    public Reservation(int numberOfRooms, double fee, boolean checkedIn, LocalDate checkInDate, LocalDate checkOutDate) {
         this.fee = fee;
         this.checkedIn = checkedIn;
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;
+        this.numberOfRooms = numberOfRooms;
+        this.givenRooms = new ArrayList<Room>();
     }
-
     
+    public boolean 
     
     public Long getReservationId() {
         return reservationId;
@@ -133,28 +144,28 @@ public class Reservation implements Serializable {
     /**
      * @return the checkInDate
      */
-    public Date getCheckInDate() {
+    public LocalDate getCheckInDate() {
         return checkInDate;
     }
 
     /**
      * @param checkInDate the checkInDate to set
      */
-    public void setCheckInDate(Date checkInDate) {
+    public void setCheckInDate(LocalDate checkInDate) {
         this.checkInDate = checkInDate;
     }
 
     /**
      * @return the checkOutDate
      */
-    public Date getCheckOutDate() {
+    public LocalDate getCheckOutDate() {
         return checkOutDate;
     }
 
     /**
      * @param checkOutDate the checkOutDate to set
      */
-    public void setCheckOutDate(Date checkOutDate) {
+    public void setCheckOutDate(LocalDate checkOutDate) {
         this.checkOutDate = checkOutDate;
     }
 
@@ -186,19 +197,6 @@ public class Reservation implements Serializable {
         this.rate = rate;
     }
 
-    /**
-     * @return the givenRoom
-     */
-    public Room getGivenRoom() {
-        return givenRoom;
-    }
-
-    /**
-     * @param givenRoom the givenRoom to set
-     */
-    public void setGivenRoom(Room givenRoom) {
-        this.givenRoom = givenRoom;
-    }
 
     /**
      * @return the chosenRoomType
@@ -212,6 +210,34 @@ public class Reservation implements Serializable {
      */
     public void setChosenRoomType(RoomType chosenRoomType) {
         this.chosenRoomType = chosenRoomType;
+    }
+
+    /**
+     * @return the numberOfRooms
+     */
+    public int getNumberOfRooms() {
+        return numberOfRooms;
+    }
+
+    /**
+     * @param numberOfRooms the numberOfRooms to set
+     */
+    public void setNumberOfRooms(int numberOfRooms) {
+        this.numberOfRooms = numberOfRooms;
+    }
+
+    /**
+     * @return the givenRooms
+     */
+    public List<Room> getGivenRooms() {
+        return givenRooms;
+    }
+
+    /**
+     * @param givenRooms the givenRooms to set
+     */
+    public void setGivenRooms(List<Room> givenRooms) {
+        this.givenRooms = givenRooms;
     }
 
 }

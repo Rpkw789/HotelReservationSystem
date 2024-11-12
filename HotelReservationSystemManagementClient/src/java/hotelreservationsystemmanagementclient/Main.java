@@ -4,17 +4,52 @@
  */
 package hotelreservationsystemmanagementclient;
 
+import ejb.session.singleton.DailyRoomAllocationSessionBeanRemote;
+import ejb.session.stateless.CheckInOutSessionBeanRemote;
+import ejb.session.stateless.EmployeeSessionBeanRemote;
+import ejb.session.stateless.GuestSessionBeanRemote;
+import ejb.session.stateless.PartnerSessionBeanRemote;
+import ejb.session.stateless.RateSessionBeanRemote;
+import ejb.session.stateless.ReservationSessionBeanRemote;
+import ejb.session.stateless.RoomAllocationSessionBeanRemote;
+import ejb.session.stateless.RoomAvailabilitySessionBeanRemote;
+import ejb.session.stateless.RoomSessionBeanRemote;
+import ejb.session.stateless.RoomTypeSessionBeanRemote;
+import javax.ejb.EJB;
+
 /**
  *
  * @author ranen
  */
 public class Main {
 
-    /**
-     * @param args the command line arguments
-     */
+    @EJB
+    private static RateSessionBeanRemote rateSessionBean;
+    @EJB
+    private static RoomSessionBeanRemote roomSessionBean;
+    @EJB
+    private static RoomAvailabilitySessionBeanRemote roomAvailabilitySessionBean;
+    @EJB
+    private static DailyRoomAllocationSessionBeanRemote dailyRoomAllocationSessionBean;
+    @EJB
+    private static RoomAllocationSessionBeanRemote roomAllocationSessionBean;
+    @EJB
+    private static CheckInOutSessionBeanRemote checkInOutSessionBean;
+    @EJB
+    private static RoomTypeSessionBeanRemote roomTypeSessionBean;
+    @EJB
+    private static ReservationSessionBeanRemote reservationSessionBean;
+    @EJB
+    private static PartnerSessionBeanRemote partnerSessionBean;
+    @EJB
+    private static GuestSessionBeanRemote guestSessionBean;
+    @EJB
+    private static EmployeeSessionBeanRemote employeeSessionBean;
+    
+    
     public static void main(String[] args) {
-        // TODO code application logic here
+        MainApp mainApp = new MainApp(checkInOutSessionBean, roomTypeSessionBean, reservationSessionBean, partnerSessionBean, guestSessionBean, employeeSessionBean, dailyRoomAllocationSessionBean, roomAllocationSessionBean, roomAvailabilitySessionBean, roomSessionBean, rateSessionBean);
+        mainApp.run();
     }
     
 }
