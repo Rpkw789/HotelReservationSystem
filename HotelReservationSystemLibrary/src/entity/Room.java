@@ -42,7 +42,7 @@ public class Room implements Serializable {
     private OperationalStatusEnum operationalStatus;
     
     // Relationships
-    @OneToOne(mappedBy = "givenRoom", optional = true)
+    @ManyToOne(optional = true)
     private Reservation reservation;
     
     @ManyToOne(optional = false)
