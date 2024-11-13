@@ -8,8 +8,11 @@ import ejb.session.stateless.EmployeeSessionBeanLocal;
 import entity.Employee;
 import entity.Guest;
 import entity.Partner;
+import entity.Rate;
 import entity.Reservation;
+import entity.RoomType;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -21,6 +24,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.EmployeeRoleEnum;
+import util.enumeration.RateTypeEnum;
 import util.exception.EmployeeNotFoundException;
 
 /**
@@ -37,38 +41,40 @@ public class DataInitialisationSessionBean {
 
     @PostConstruct
     public void postConstruct() {
+        System.out.println("DataInitialisationSessionBean postConstruct called.");
+
         try {
             Query query = em.createQuery("SELECT e FROM Employee e WHERE e.username = 'username'");
             Employee employee = (Employee) query.getSingleResult();
+            System.out.println("Employee data found, skipping initialization.");
         } catch (NoResultException ex) {
+            System.out.println("Initializing employee data.");
             employeeDataInitialisation();
         }
+
         try {
             Query query = em.createQuery("SELECT p FROM Partner p WHERE p.username = 'username'");
             Partner partner = (Partner) query.getSingleResult();
+            System.out.println("Partner data found, skipping initialization.");
         } catch (NoResultException ex) {
+            System.out.println("Initializing partner data.");
             partnerDataInitialisation();
-        }
-        try {
-            Query query = em.createQuery("SELECT g FROM Guest g WHERE g.username = 'username'");
-            Guest guest = (Guest) query.getSingleResult();
-        } catch (NoResultException ex) {
-            em.persist(new Guest("name", "username", "password", "ranen@gmail.com", "98417645","A12345678"));
         }
     }
 
     private void employeeDataInitialisation() {
+        System.out.println("Creating initial employee data.");
         Employee employee = new Employee("username", "password", "employee");
-        em.persist(employee);
         employee.getEmployeeRoles().add(EmployeeRoleEnum.SYSTEM_ADMINISTRATOR);
         employee.getEmployeeRoles().add(EmployeeRoleEnum.GUEST_RELATION_OFFICER);
         employee.getEmployeeRoles().add(EmployeeRoleEnum.OPERATION_MANAGER);
         employee.getEmployeeRoles().add(EmployeeRoleEnum.SALES_MANAGER);
+        em.persist(employee);
     }
 
     private void partnerDataInitialisation() {
+        System.out.println("Creating initial partner data.");
         Partner partner = new Partner("username", "password", "Holiday", "holiday@gmail.com", "62248440");
         em.persist(partner);
     }
-
 }

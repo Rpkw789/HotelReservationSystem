@@ -4,15 +4,8 @@
  */
 package hotelreservationsystemreservationclient;
 
-import ejb.session.singleton.DailyRoomAllocationSessionBeanRemote;
-import ejb.session.stateless.CheckInOutSessionBeanRemote;
-import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.GuestSessionBeanRemote;
-import ejb.session.stateless.PartnerSessionBeanRemote;
-import ejb.session.stateless.RateSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
-import ejb.session.stateless.RoomAllocationSessionBeanRemote;
-import ejb.session.stateless.RoomAvailabilitySessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import javax.ejb.EJB;
@@ -22,9 +15,24 @@ import javax.ejb.EJB;
  * @author ranen
  */
 public class Main {
+
+    @EJB
+    private static RoomTypeSessionBeanRemote roomTypeSessionBean;
+
+    @EJB
+    private static RoomSessionBeanRemote roomSessionBean;
+
+    @EJB
+    private static ReservationSessionBeanRemote reservationSessionBean;
+
+    @EJB
+    private static GuestSessionBeanRemote guestSessionBean;
+    
     
     
     public static void main(String[] args) {
+        MainApp mainapp = new MainApp(roomTypeSessionBean, roomSessionBean, reservationSessionBean, guestSessionBean);
+        mainapp.runApp();
     }
     
 }

@@ -6,6 +6,8 @@ package ejb.session.stateless;
 
 import entity.Guest;
 import entity.Partner;
+import entity.Reservation;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -65,12 +67,14 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
     
     @Override
     public boolean isUniqueUsername(String username) {
-        TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(g) FROM Guest g WHERE g.username = :username", Long.class);
+        Query query = em.createQuery("SELECT g FROM Guest g WHERE g.username = :username");
         query.setParameter("username", username);
-
-        Long count = query.getSingleResult();
-        return count < 0; //return true if no other username exists yet
+        try {
+            query.getSingleResult();
+            return false;
+        } catch (NoResultException ex) {
+            return true;
+        }
     }
     
     @Override
@@ -87,5 +91,6 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
             throw new GuestNotFoundException("Multiple Guests with passportNumber '" + passportNumber + "' found");
         }
     }
+
 
 }
