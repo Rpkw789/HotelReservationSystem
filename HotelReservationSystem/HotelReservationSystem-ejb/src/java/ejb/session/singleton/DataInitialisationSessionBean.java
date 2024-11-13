@@ -6,6 +6,7 @@ package ejb.session.singleton;
 
 import ejb.session.stateless.EmployeeSessionBeanLocal;
 import entity.Employee;
+import entity.Guest;
 import entity.Partner;
 import entity.Reservation;
 import java.time.LocalDate;
@@ -48,10 +49,11 @@ public class DataInitialisationSessionBean {
         } catch (NoResultException ex) {
             partnerDataInitialisation();
         }
-        Query query = em.createQuery("SELECT r FROM Reservation r");
-        List<Reservation> list = query.getResultList();
-        if(list.isEmpty()) {
-            reservationDataInitialisation();
+        try {
+            Query query = em.createQuery("SELECT g FROM Guest g WHERE g.username = 'username'");
+            Guest guest = (Guest) query.getSingleResult();
+        } catch (NoResultException ex) {
+            em.persist(new Guest("name", "username", "password", "ranen@gmail.com", "98417645","A12345678"));
         }
     }
 
@@ -69,9 +71,4 @@ public class DataInitialisationSessionBean {
         em.persist(partner);
     }
 
-    private void reservationDataInitialisation() {
-        em.persist(new Reservation(1, 20, false, LocalDate.parse("2024-06-12"), LocalDate.parse("2024-06-15")));
-        em.persist(new Reservation(1, 20, false, LocalDate.parse("2024-06-10"), LocalDate.parse("2024-06-13")));
-        em.persist(new Reservation(1, 20, false, LocalDate.parse("2024-06-14"), LocalDate.parse("2024-06-17")));
-    }
 }

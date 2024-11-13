@@ -15,6 +15,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -56,30 +57,35 @@ public class Reservation implements Serializable {
     @JoinColumn(nullable = false)
     private Guest guest;
     
-    @ManyToOne(optional = false)
-    @JoinColumn(nullable = false)
-    private Rate rate;
+    @ManyToMany
+    private List<Rate> rates = new ArrayList<Rate>();
     
     @OneToMany(mappedBy = "reservation")
     private List<Room> givenRooms;
     
     @OneToOne(optional = false)
     @JoinColumn(nullable = false)
-    private RoomType chosenRoomType;
+    private RoomType roomType;
 
     public Reservation() {
     }
 
-    public Reservation(int numberOfRooms, double fee, boolean checkedIn, LocalDate checkInDate, LocalDate checkOutDate) {
+    public Reservation(int numberOfRooms, double fee, boolean checkedIn, LocalDate checkInDate, LocalDate checkOutDate, RoomType roomType) {
         this.fee = fee;
         this.checkedIn = checkedIn;
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;
         this.numberOfRooms = numberOfRooms;
+        this.roomType = roomType;
         this.givenRooms = new ArrayList<Room>();
     }
     
-    public boolean 
+    public boolean overlaps(LocalDate startDate, LocalDate endDate) {
+        if(this.checkInDate.isAfter(endDate) || this.checkOutDate.isBefore(startDate)) {
+            return false;
+        }
+        return true;
+    }
     
     public Long getReservationId() {
         return reservationId;
@@ -183,33 +189,19 @@ public class Reservation implements Serializable {
         this.guest = guest;
     }
 
+
     /**
-     * @return the rate
+     * @return the roomType
      */
-    public Rate getRate() {
-        return rate;
+    public RoomType getRoomType() {
+        return roomType;
     }
 
     /**
-     * @param rate the rate to set
+     * @param roomType the roomType to set
      */
-    public void setRate(Rate rate) {
-        this.rate = rate;
-    }
-
-
-    /**
-     * @return the chosenRoomType
-     */
-    public RoomType getChosenRoomType() {
-        return chosenRoomType;
-    }
-
-    /**
-     * @param chosenRoomType the chosenRoomType to set
-     */
-    public void setChosenRoomType(RoomType chosenRoomType) {
-        this.chosenRoomType = chosenRoomType;
+    public void setRoomType(RoomType roomType) {
+        this.roomType = roomType;
     }
 
     /**
@@ -238,6 +230,20 @@ public class Reservation implements Serializable {
      */
     public void setGivenRooms(List<Room> givenRooms) {
         this.givenRooms = givenRooms;
+    }
+
+    /**
+     * @return the rates
+     */
+    public List<Rate> getRates() {
+        return rates;
+    }
+
+    /**
+     * @param rates the rates to set
+     */
+    public void setRates(List<Rate> rates) {
+        this.rates = rates;
     }
 
 }

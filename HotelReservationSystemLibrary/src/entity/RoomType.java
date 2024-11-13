@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
@@ -60,6 +61,10 @@ public class RoomType implements Serializable {
     @OneToMany(mappedBy = "roomType")
     private List<Room> rooms;
     
+    @OneToMany(mappedBy = "roomType")
+    private List<Reservation> reservations;
+   
+    
     private boolean enabled = true;
 
     public RoomType() {
@@ -74,6 +79,7 @@ public class RoomType implements Serializable {
         this.amenities = new ArrayList<String>();
         this.rooms = new ArrayList<Room>();
         this.rates = new ArrayList<Rate>();
+        this.reservations = new ArrayList<Reservation>();
     }
     
     
@@ -235,6 +241,20 @@ public class RoomType implements Serializable {
      */
     public void setRates(List<Rate> rates) {
         this.rates = rates;
+    }
+
+    /**
+     * @return the reservations
+     */
+    public List<Reservation> getReservations() {
+        return reservations;
+    }
+
+    /**
+     * @param reservations the reservations to set
+     */
+    public void setReservations(List<Reservation> reservations) {
+        this.reservations = reservations;
     }
 
 }
