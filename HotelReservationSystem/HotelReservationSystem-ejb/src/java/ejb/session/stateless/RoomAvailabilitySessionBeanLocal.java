@@ -24,5 +24,7 @@ public interface RoomAvailabilitySessionBeanLocal {
     public double getCostWalkIn(LocalDate checkInDate, LocalDate checkOutDate, Long roomTypeId);
 
     public List<Rate> getRateByRoomTypeWalkIn(Long roomTypeId);
+
+    public List<Rate> getRateByRoomType(LocalDate checkInDate, LocalDate checkOutDate, Long roomTypeId);
     
 }

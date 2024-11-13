@@ -6,12 +6,15 @@ package ejb.session.stateless;
 
 import entity.Reservation;
 import entity.Room;
+import entity.RoomAllocationExceptionRecord;
 import entity.RoomType;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -24,6 +27,9 @@ import util.enumeration.RoomAvailabilityStatusEnum;
  */
 @Stateless
 public class RoomAllocationSessionBean implements RoomAllocationSessionBeanRemote, RoomAllocationSessionBeanLocal {
+
+    @EJB
+    private RoomTypeSessionBeanLocal roomTypeSessionBean;
 
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
@@ -53,6 +59,8 @@ public class RoomAllocationSessionBean implements RoomAllocationSessionBeanRemot
 
             int roomCounter = 0;
             int reservationCounter = 0;
+
+            outer:
             for (; roomCounter < availableRooms.size() && reservationCounter < reservationsForThisRoomType.size();) {
                 Reservation reservation = reservationsForThisRoomType.get(reservationCounter);
                 int numberOfRooms = reservation.getNumberOfRooms();
@@ -64,16 +72,53 @@ public class RoomAllocationSessionBean implements RoomAllocationSessionBeanRemot
                     reservation.getGivenRooms().add(room);
 
                     roomCounter++;
+                    if (roomCounter >= availableRooms.size()) {
+                        break outer;
+                    }
                 }
                 reservationCounter++;
             }
 
+            // EXCEPTIONS
+            List<RoomType> filteredRoomType = new ArrayList<RoomType>();
+            List<RoomType> roomTypes = roomTypeSessionBean.getAllRoomType();
+            roomTypes.stream().filter(rt -> rt.isEnabled()).forEach(rt -> filteredRoomType.add(rt));
+
             if (reservationCounter < reservationsForThisRoomType.size()) {
+                outerity:
                 for (int i = reservationCounter; i < reservationsForThisRoomType.size(); i++) {
                     Reservation reservation = reservationsForThisRoomType.get(i);
                     int numberOfRooms = reservation.getNumberOfRooms();
+                    int numberOfRoomsLeft = numberOfRooms - reservation.getGivenRooms().size();
+
+                    RoomType unavailableRoomType = reservation.getRoomType();
                     
-                    
+                    outery:
+                    for (int j = numberOfRoomsLeft; j > 0; j--) {
+                        RoomType currentRoomType = unavailableRoomType;
+                        while (currentRoomType.getNextHigherRoomType() != null) {
+                            currentRoomType = currentRoomType.getNextHigherRoomType();
+
+                            List<Room> roomsies = currentRoomType.getRooms();
+                            List<Room> updatedAvailableRooms = new ArrayList<Room>();
+                            roomsies.stream().filter(r -> r.getAvailabilityStatus().equals(RoomAvailabilityStatusEnum.AVAILABLE) && r.getReservation() == null).forEach(r -> updatedAvailableRooms.add(r));
+
+                            if (!updatedAvailableRooms.isEmpty()) {
+                                Room room = updatedAvailableRooms.get(0);
+                                room.setReservation(reservation);
+                                reservation.getGivenRooms().add(room);
+                                RoomAllocationExceptionRecord record = new RoomAllocationExceptionRecord(currentDate, "1 Room Upgraded From " + unavailableRoomType.getName() + " To " + currentRoomType.getName());
+                                record.setAffectedReservation(reservation);
+                                em.persist(record);
+                                numberOfRoomsLeft--;
+                                continue outery;
+                            }
+                        }
+                        RoomAllocationExceptionRecord record = new RoomAllocationExceptionRecord(currentDate, "No Available Rooms for " + numberOfRoomsLeft + " Rooms");
+                        record.setAffectedReservation(reservation);
+                        em.persist(record);
+                        continue outerity;
+                    }
                 }
             }
         }

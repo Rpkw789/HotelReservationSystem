@@ -70,6 +70,7 @@ public class RoomAvailabilitySessionBean implements RoomAvailabilitySessionBeanR
         return result;
     }
 
+    @Override
     public double getCostWalkIn(LocalDate checkInDate, LocalDate checkOutDate, Long roomTypeId) {
         RoomType roomType = em.find(RoomType.class, roomTypeId);
         List<Rate> rates = roomType.getRates();
@@ -84,29 +85,32 @@ public class RoomAvailabilitySessionBean implements RoomAvailabilitySessionBeanR
         List<Rate> rates = roomType.getRates();
 
         List<Rate> usedRates = new ArrayList<Rate>();
-        for (LocalDate date = checkInDate; !date.isAfter(checkOutDate); date = date.plusDays(1)) {
+        for (LocalDate date = checkInDate; !date.isAfter(checkOutDate.minusDays(1)); date = date.plusDays(1)) {
+            
             List<Rate> currentRates = new ArrayList<Rate>();
-            for(Rate rate : rates) {
+            for (Rate rate : rates) {
                 if (rate.overlaps(date)) {
                     currentRates.add(rate);
                 }
             }
             
-            
+            currentRates.sort(null);
+            usedRates.add(currentRates.get(currentRates.size() - 1));
         }
-        
-        return null;
+
+        return usedRates;
     }
-    
+
+    @Override
     public List<Rate> getRateByRoomTypeWalkIn(Long roomTypeId) {
         RoomType roomType = em.find(RoomType.class, roomTypeId);
         List<Rate> rates = roomType.getRates();
-        
+
         Rate publishedRate = rates.stream().filter(r -> r.getRateType().equals(RateTypeEnum.PUBLISHED)).findFirst().get();
         List<Rate> usedRates = new ArrayList<Rate>();
-        
+
         usedRates.add(publishedRate);
-        
+
         return usedRates;
     }
 

@@ -102,10 +102,13 @@ public class HotelOperationModule {
 
                 if (role == EmployeeRoleEnum.OPERATION_MANAGER) {
                     generalOperationMenu();
+                    return;
                 } else if (role == EmployeeRoleEnum.SALES_MANAGER) {
                     salesOperationMenu();
+                    return;
                 } else if (role == EmployeeRoleEnum.GUEST_RELATION_OFFICER) {
                     guestOperationMenu();
+                    return;
                 }
             }
         }
@@ -209,7 +212,9 @@ public class HotelOperationModule {
 
     private void doCreateNewRoomType() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("");
+        List<RoomType> roomTypes = roomTypeSessionBean.getAllRoomType();
+        List<RoomType> filteredRoomTypes = new ArrayList<RoomType>();
+        roomTypes.stream().filter(roomType -> roomType.isEnabled()).forEach(x -> filteredRoomTypes.add(x));
         System.out.println("*Create New Room Type*");
         String name = "";
         while (true) {
@@ -222,6 +227,7 @@ public class HotelOperationModule {
                 System.out.println("Error: Name taken. Enter another name");
             }
         }
+
         System.out.print("Description > ");
         String description = scanner.nextLine().trim();
         System.out.print("Size > ");
@@ -233,6 +239,24 @@ public class HotelOperationModule {
         scanner.nextLine();
         int count = 1;
         RoomType roomType = new RoomType(name, description, size, bed, capacity);
+
+        while (!filteredRoomTypes.isEmpty()) {
+            System.out.println("Choose Room Type");
+            for (int i = 0; i < filteredRoomTypes.size(); i++) {
+                System.out.println((i + 1) + ": " + filteredRoomTypes.get(i).getName());
+            }
+            System.out.println((filteredRoomTypes.size() + 1) + ": NIL");
+            int response = scanner.nextInt();
+            scanner.nextLine();
+            if (response == filteredRoomTypes.size() + 1) {
+                break;
+            }
+
+            RoomType nextHigherRoomType = filteredRoomTypes.get(response - 1);
+            roomType.setNextHigherRoomType(nextHigherRoomType);
+            break;
+        }
+        
         System.out.println("Type 'q' if you have no more amenities");
         List<String> amenities = roomType.getAmenities();
         while (true) {
@@ -438,6 +462,9 @@ public class HotelOperationModule {
 
             RoomType roomType = roomTypes.get(response - 1);
             System.out.println("RoomType - " + roomType.getRoomTypeId());
+            if(roomType.getNextHigherRoomType() != null) {
+               System.out.println("Next Higher Room Type: " + roomType.getNextHigherRoomType().getName()); 
+            }
             System.out.println("Name: " + roomType.getName());
             System.out.println("Description: " + roomType.getDescription());
             System.out.println("Size: " + roomType.getSize());
@@ -997,7 +1024,7 @@ public class HotelOperationModule {
         for (int i = 0; i < roomTypesAndNumber.size(); i++) {
             Pair<RoomType, Integer> pair = roomTypesAndNumber.get(i);
             double cost = roomAvailabilitySessionBean.getCostWalkIn(startDate, endDate, pair.getKey().getRoomTypeId());
-            System.out.println((i + 1) + ": Room Type = " + pair.getKey().getName() + ", Quantity = " + pair.getValue() + ", Cost = " + cost);
+            System.out.println((i + 1) + ": Room Type = " + pair.getKey().getName() + ", Quantity = " + pair.getValue() + ", Cost Per Room = " + cost);
         }
         int exit = roomTypesAndNumber.size() + 1;
         System.out.println(exit + ": Exit");
@@ -1014,7 +1041,7 @@ public class HotelOperationModule {
         System.out.print("Number of Rooms > ");
         int numberOfRooms = scanner.nextInt();
         scanner.nextLine();
-        Reservation reservation = new Reservation(numberOfRooms, cost, false, startDate, endDate, chosenPair.getKey());
+        Reservation reservation = new Reservation(numberOfRooms, cost * numberOfRooms, false, startDate, endDate, chosenPair.getKey());
         List<Rate> usedRates = roomAvailabilitySessionBean.getRateByRoomTypeWalkIn(chosenPair.getKey().getRoomTypeId());
         reservation.setRates(usedRates);
 
@@ -1050,7 +1077,8 @@ public class HotelOperationModule {
         System.out.print("Current Date > ");
         String date = scanner.nextLine().trim();
         LocalDate currentDate = LocalDate.parse(date);
-        
-        
+
+        roomAllocationSessionBean.allocateDailyReservation(currentDate);
+        System.out.println("Allocated Rooms for " + date);
     }
 }

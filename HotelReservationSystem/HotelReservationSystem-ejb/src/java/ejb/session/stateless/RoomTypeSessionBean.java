@@ -26,28 +26,31 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
     private EntityManager em;
 
     @Override
-    public Long createRoomType(RoomType newRoomType) throws RoomTypeExistsException{
-        
+    public Long createRoomType(RoomType newRoomType) throws RoomTypeExistsException {
+
         if (isUniqueName(newRoomType.getName())) {
+            if (newRoomType.getNextHigherRoomType() != null) {
+                RoomType higherRoomType = em.find(RoomType.class, newRoomType.getNextHigherRoomType().getRoomTypeId());
+                newRoomType.setNextHigherRoomType(higherRoomType);
+            }
             em.persist(newRoomType);
             em.flush();
-        
+
             return newRoomType.getRoomTypeId();
-        }
-        else {
+        } else {
             throw new RoomTypeExistsException("Room type already exists!");
         }
     }
-    
+
     @Override
     public boolean isUniqueName(String name) {
         Query query = em.createQuery("SELECT r FROM RoomType r WHERE r.name = :name");
         query.setParameter("name", name);
-        
+
         try {
             query.getSingleResult();
             return false;
-        } catch(NoResultException ex) {
+        } catch (NoResultException ex) {
             return true;
         }
     }
@@ -55,26 +58,26 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
     @Override
     public RoomType updateRoomType(RoomType updatedRoomType) throws RoomTypeNotFoundException {
         RoomType old = em.find(RoomType.class, updatedRoomType.getRoomTypeId());
-        
-        if (old==null){
+
+        if (old == null) {
             throw new RoomTypeNotFoundException("Room type does not exist!");
         } else {
             em.merge(updatedRoomType);
             return updatedRoomType;
         }
     }
-    
+
     @Override
-    public void deleteRoomType(Long roomTypeId) throws RoomTypeNotFoundException{
+    public void deleteRoomType(Long roomTypeId) throws RoomTypeNotFoundException {
         RoomType roomtype = em.find(RoomType.class, roomTypeId);
-        
+
         if (roomtype == null) {
             throw new RoomTypeNotFoundException("Room type does not exist!");
         } else {
             em.remove(roomtype);
         }
     }
-    
+
     @Override
     public List<RoomType> getAllRoomType() {
         List<RoomType> roomTypes = em.createQuery("SELECT r FROM RoomType r").getResultList();

@@ -5,8 +5,10 @@
 package ejb.session.stateless;
 
 import entity.Guest;
+import entity.Rate;
 import entity.Reservation;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -44,9 +46,18 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     public Long createReservation(Reservation reservation, Long guestId) {
         Guest guest = em.find(Guest.class, guestId);
         reservation.setGuest(guest);
+        List<Rate> detachedRates = reservation.getRates();
+        reservation.setRates(new ArrayList<Rate>());
+
         em.persist(reservation);
         em.flush();
-        
+
+        for (Rate rate : detachedRates) {
+            Rate actualRate = em.find(Rate.class, rate.getRateId());
+            reservation.getRates().add(actualRate);
+            actualRate.getReservations().add(reservation);
+        }
+
         reservation.getRoomType().getReservations().add(reservation);
 
         guest.getReservations().add(reservation);
