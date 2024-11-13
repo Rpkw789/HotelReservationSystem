@@ -65,7 +65,10 @@ public class GuestModule {
                 doViewReservationDetails();
             } else if (response == 3) {
                 doViewAllReservations();
-            } else {
+            } else if (response ==4) {
+                return;
+            }
+            else {
                 System.out.println();
                 System.out.println("Error: Enter input again");
                 System.out.println();
