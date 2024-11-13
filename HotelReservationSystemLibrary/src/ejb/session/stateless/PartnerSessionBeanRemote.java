@@ -4,9 +4,13 @@
  */
 package ejb.session.stateless;
 
+import entity.Guest;
 import entity.Partner;
+import entity.Reservation;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.GuestNotFoundException;
+import util.exception.PartnerAccountExistsException;
 import util.exception.PartnerExistsException;
 import util.exception.PartnerNotFoundException;
 
@@ -24,4 +28,8 @@ public interface PartnerSessionBeanRemote {
     public List<Partner> getAllPartners();
 
     public Partner getPartnerByUsername(String username) throws PartnerNotFoundException;
+    public Guest createPartnerAccount(Guest g) throws PartnerAccountExistsException;
+    public boolean isUniqueGuestUsername(String username);
+    public Guest getPartnerAccountByUsername(String username) throws GuestNotFoundException;
+    public List<Reservation> retrieveAllReservations(Partner p);
 }

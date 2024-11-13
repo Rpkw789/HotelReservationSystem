@@ -61,7 +61,7 @@ public class Reservation implements Serializable {
     private List<Rate> rates = new ArrayList<Rate>();
     
     @OneToMany(mappedBy = "reservation")
-    private List<Room> givenRooms;
+    private List<Room> givenRooms = new ArrayList<Room>();
     
     @OneToOne(optional = false)
     @JoinColumn(nullable = false)
@@ -228,8 +228,8 @@ public class Reservation implements Serializable {
     /**
      * @param givenRooms the givenRooms to set
      */
-    public void setGivenRooms(List<Room> givenRooms) {
-        this.givenRooms = givenRooms;
+    public void setGivenRooms(List<Room> rooms) {
+        this.givenRooms = rooms;
     }
 
     /**
@@ -242,8 +242,8 @@ public class Reservation implements Serializable {
     /**
      * @param rates the rates to set
      */
-    public void setRates(List<Rate> rates) {
-        this.rates = rates;
+    public void setRates(List<Rate> rate) {
+        this.rates = rate;
     }
 
 }

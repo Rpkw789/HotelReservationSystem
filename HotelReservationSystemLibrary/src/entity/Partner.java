@@ -5,6 +5,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,11 +18,13 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import util.enumeration.PartnerRoleEnum;
 
 /**
  *
  * @author ranen
  */
+
 @Entity
 public class Partner implements Serializable {
 
@@ -53,15 +56,20 @@ public class Partner implements Serializable {
     
     // Relationships
     @OneToMany
+    @JoinColumn(name = "partner_id")
     private List<Guest> guests;
     
+    private PartnerRoleEnum role;
+    
 
-    public Partner(String username, String password, String organisationName, String email, String mobileNumber) {
+    public Partner(String username, String password, String organisationName, String email, String mobileNumber, PartnerRoleEnum role) {
         this.username = username;
         this.password = password;
         this.organisationName = organisationName;
         this.email = email;
         this.mobileNumber = mobileNumber;
+        this.role =role;
+        this.guests = new ArrayList<Guest> ();
     }
 
     public Partner() {

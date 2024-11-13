@@ -41,6 +41,7 @@ public class MainApp {
             System.out.println("***Welcome To Hotel Reservation System - Reservation Client***");
             System.out.println("1: Log-in");
             System.out.println("2: Register");
+            System.out.println("3: Exist");
             
             int response = sc.nextInt();
             
@@ -54,7 +55,10 @@ public class MainApp {
                 }
             } else if (response == 2) {
                 doRegister();
-            } else {
+            } else if (response ==3) {
+                return;
+            } 
+            else {
                  System.out.println();
                 System.out.println("Error: Enter input again");
                 System.out.println();

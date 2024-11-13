@@ -24,6 +24,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.EmployeeRoleEnum;
+import util.enumeration.PartnerRoleEnum;
 import util.enumeration.RateTypeEnum;
 import util.exception.EmployeeNotFoundException;
 
@@ -74,7 +75,7 @@ public class DataInitialisationSessionBean {
 
     private void partnerDataInitialisation() {
         System.out.println("Creating initial partner data.");
-        Partner partner = new Partner("username", "password", "Holiday", "holiday@gmail.com", "62248440");
+        Partner partner = new Partner("username", "password", "Holiday", "holiday@gmail.com", "62248440", PartnerRoleEnum.PARTNER_RESERVATION_MANAGER);
         em.persist(partner);
     }
 }

@@ -11,6 +11,7 @@ import entity.Partner;
 import java.util.List;
 import java.util.Scanner;
 import util.enumeration.EmployeeRoleEnum;
+import util.enumeration.PartnerRoleEnum;
 import util.exception.EmployeeExistsException;
 import util.exception.PartnerExistsException;
 
@@ -185,7 +186,7 @@ public class SystemAdministrationModule {
             }
         }
 
-        Partner partner = new Partner(username, password, organisationName, email, mobileNumber);
+        Partner partner = new Partner(username, password, organisationName, email, mobileNumber, PartnerRoleEnum.PARTNER_RESERVATION_MANAGER);
         try {
             Long partnerId = partnerSessionBean.createNewPartner(partner);
             System.out.println("");
