@@ -31,6 +31,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     public List<Reservation> getReservationByPassportNumber(String passportNumber) throws ReservationNotFoundException {
         try {
             Guest guest = guestSessionBean.getGuestByPassportNumber(passportNumber);
+            guest.getReservations().size();
             return guest.getReservations();
         } catch (GuestNotFoundException ex) {
             throw new ReservationNotFoundException(ex.getMessage());

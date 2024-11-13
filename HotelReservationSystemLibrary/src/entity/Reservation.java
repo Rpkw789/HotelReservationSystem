@@ -78,8 +78,7 @@ public class Reservation implements Serializable {
         this.numberOfRooms = numberOfRooms;
         this.givenRooms = new ArrayList<Room>();
     }
-    
-    public boolean 
+   
     
     public Long getReservationId() {
         return reservationId;
