@@ -33,7 +33,7 @@ import util.enumeration.RateTypeEnum;
  * @author taniafoo
  */
 @Entity
-public class Rate implements Serializable {
+public class Rate implements Serializable, Comparable<Rate> {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -238,6 +238,23 @@ public class Rate implements Serializable {
      */
     public void setReservations(List<Reservation> reservations) {
         this.reservations = reservations;
+    }
+    
+    private int getPriorityValue() {
+        if(rateType.equals(RateTypeEnum.PUBLISHED)) {
+            return 4;
+        } else if(rateType.equals(RateTypeEnum.PEAK)) {
+            return 3;
+        } else if(rateType.equals(RateTypeEnum.NORMAL)) {
+            return 2;
+        } else {
+            return 1;
+        }
+    }
+
+    @Override
+    public int compareTo(Rate another) {
+        return Integer.compare(this.getPriorityValue(), another.getPriorityValue());
     }
 
 }

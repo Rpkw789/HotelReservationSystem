@@ -6,16 +6,22 @@ package hotelreservationsystemreservationclient;
 
 import ejb.session.stateless.GuestSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
+import ejb.session.stateless.RoomAvailabilitySessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import entity.DateTimeParseException;
 import entity.Guest;
+import entity.Rate;
 import entity.Reservation;
+import entity.RoomType;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
+import javafx.util.Pair;
 import util.exception.ReservationNotFoundException;
 
 /**
@@ -29,13 +35,15 @@ public class GuestModule {
     private ReservationSessionBeanRemote reservationSessionBean;
     private GuestSessionBeanRemote guestSessionBean;
     private Guest guest;
+    private RoomAvailabilitySessionBeanRemote roomAvailabilitySessionBean;
 
-    public GuestModule(RoomTypeSessionBeanRemote roomTypeSessionBean, RoomSessionBeanRemote roomSessionBean, ReservationSessionBeanRemote reservationSessionBean, GuestSessionBeanRemote guestSessionBean, Guest guest) {
+    public GuestModule(RoomTypeSessionBeanRemote roomTypeSessionBean, RoomSessionBeanRemote roomSessionBean, ReservationSessionBeanRemote reservationSessionBean, GuestSessionBeanRemote guestSessionBean, Guest guest, RoomAvailabilitySessionBeanRemote roomAvailabilitySessionBean) {
         this.roomTypeSessionBean = roomTypeSessionBean;
         this.roomSessionBean = roomSessionBean;
         this.reservationSessionBean = reservationSessionBean;
         this.guestSessionBean = guestSessionBean;
         this.guest = guest;
+        this.roomAvailabilitySessionBean = roomAvailabilitySessionBean;
     }
 
     public void mainMenu() {
@@ -66,24 +74,58 @@ public class GuestModule {
     }
 
     private void doSearch() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("");
-        System.out.println("*Reserve a room*");
-        System.out.println("Enter a check-in date (yyyy-MM-dd):");
-        String dateInput = sc.nextLine().trim();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        // Parse the string to a LocalDate object
-        LocalDate checkInDate = LocalDate.parse(dateInput, formatter);
+        Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Enter a check-in date (yyyy-MM-dd):");
-        dateInput = sc.nextLine().trim();
-        // Parse the string to a LocalDate object
-        LocalDate checkOutDate = LocalDate.parse(dateInput, formatter);
-        
-        
+        System.out.println("*Walk In Search & Reserve Room*");
+        System.out.print("Enter Check-In Date (YYYY-MM-DD) > ");
+        LocalDate startDate = LocalDate.parse(scanner.nextLine().trim());
+        System.out.print("Enter Check-Out Date (YYYY-MM-DD) > ");
+        LocalDate endDate = LocalDate.parse(scanner.nextLine().trim());
 
+        List<Pair<RoomType, Integer>> roomTypesAndNumber = roomAvailabilitySessionBean.getAvailableRoomTypeAndNumber(startDate, endDate);
+        System.out.println("Available Room Types and Quantity");
+        for (int i = 0; i < roomTypesAndNumber.size(); i++) {
+            Pair<RoomType, Integer> pair = roomTypesAndNumber.get(i);
+            List<Rate> rates = roomAvailabilitySessionBean.getRateByRoomType(startDate, endDate, pair.getKey().getRoomTypeId());
+
+            double cost = 0;
+            for (Rate rate : rates) {
+                cost += rate.getRatePerNight();
+            }
+
+            System.out.println((i + 1) + ": Room Type = " + pair.getKey().getName() + ", Quantity = " + pair.getValue() + ", Cost Per Room = " + cost);
+        }
+        int exit = roomTypesAndNumber.size() + 1;
+        System.out.println(exit + ": Exit");
+        System.out.println("Choose Room Type");
+
+        int response = scanner.nextInt();
+        scanner.nextLine();
+        if (response == exit) {
+            return;
+        }
+        Pair<RoomType, Integer> pair = roomTypesAndNumber.get(response - 1);
+        List<Rate> rates = roomAvailabilitySessionBean.getRateByRoomType(startDate, endDate, pair.getKey().getRoomTypeId());
+
+        double cost = 0;
+        for (Rate rate : rates) {
+            cost += rate.getRatePerNight();
+        }
         
-        doViewAllReservations();
+        Set<Rate> uniqueRates = new HashSet<Rate>();
+        rates.stream().forEach(r -> uniqueRates.add(r));
+
+        System.out.print("Number of Rooms > ");
+        int numberOfRooms = scanner.nextInt();
+        scanner.nextLine();
+
+        Reservation reservation = new Reservation(numberOfRooms, cost * numberOfRooms, false, startDate, endDate, pair.getKey());
+        reservation.setRates(rates);
+
+        Long reservationId = reservationSessionBean.createReservation(reservation, guest.getGuestId());
+
+        System.out.println("Reservation made with reservation id " + reservationId);
+
     }
 
     private void doViewReservationDetails() {

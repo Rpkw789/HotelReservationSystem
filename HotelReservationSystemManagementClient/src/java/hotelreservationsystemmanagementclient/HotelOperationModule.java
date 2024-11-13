@@ -1041,7 +1041,7 @@ public class HotelOperationModule {
         System.out.print("Number of Rooms > ");
         int numberOfRooms = scanner.nextInt();
         scanner.nextLine();
-        Reservation reservation = new Reservation(numberOfRooms, cost, false, startDate, endDate, chosenPair.getKey());
+        Reservation reservation = new Reservation(numberOfRooms, cost * numberOfRooms, false, startDate, endDate, chosenPair.getKey());
         List<Rate> usedRates = roomAvailabilitySessionBean.getRateByRoomTypeWalkIn(chosenPair.getKey().getRoomTypeId());
         reservation.setRates(usedRates);
 
