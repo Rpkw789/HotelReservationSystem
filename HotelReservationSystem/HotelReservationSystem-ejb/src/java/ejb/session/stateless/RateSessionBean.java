@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entity.Rate;
 import entity.RoomType;
+import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -14,6 +15,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import util.enumeration.OperationalStatusEnum;
+import util.enumeration.RateTypeEnum;
 import util.exception.RateExistsException;
 import util.exception.RateNotFoundException;
 
@@ -33,6 +35,7 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
             newRate.setRoomType(em.find(RoomType.class, newRate.getRoomType().getRoomTypeId()));
             em.persist(newRate);
             em.flush();
+            
             RoomType roomType = newRate.getRoomType();
             roomType.getRates().add(newRate);
             return newRate.getRateId();

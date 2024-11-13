@@ -58,7 +58,7 @@ public class Guest implements Serializable {
 
     // Relationships
     @OneToMany(mappedBy = "guest")
-    private List<Reservation> reservations;
+    private List<Reservation> reservations = new ArrayList<Reservation>();
 
     public Guest() {
     }

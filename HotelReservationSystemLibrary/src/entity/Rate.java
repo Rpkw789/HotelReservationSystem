@@ -8,7 +8,9 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -17,6 +19,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
@@ -36,32 +39,32 @@ public class Rate implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rateId;
-    
-    @Column(length=50, nullable=false)
+
+    @Column(length = 50, nullable = false)
     @NotNull
     private String name;
-    
+
     @NotNull
     @PositiveOrZero
-    @Column(nullable=false)
+    @Column(nullable = false)
     private double ratePerNight;
-    
+
     @Enumerated(EnumType.STRING)
     private RateTypeEnum rateType;
-    
+
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private RoomType roomType;
-    
-    @Column(nullable=true)
+
+    @Column(nullable = true)
     private LocalDate validityStart;
-    @Column(nullable=true)
+    @Column(nullable = true)
     private LocalDate validityEnd;
-    
+
     @Column(nullable = false)
     private OperationalStatusEnum operationalStatus = OperationalStatusEnum.ENABLED;
-    
-    @OneToMany(mappedBy = "rate")
+
+    @ManyToMany(mappedBy = "rates")
     private List<Reservation> reservations = new ArrayList<Reservation>();
 
     public Rate() {
@@ -73,9 +76,25 @@ public class Rate implements Serializable {
         this.rateType = rateType;
         this.roomType = roomType;
     }
-    
 
+    public boolean overlaps(LocalDate startDate, LocalDate endDate) {
+        if (this.validityStart.isAfter(endDate) || this.validityEnd.isBefore(startDate)) {
+            return false;
+        }
+        return true;
+    }
     
+    public double calculateCost(int nights) {
+        return nights * ratePerNight;
+    }
+
+    public boolean overlaps(LocalDate currentDate) {
+        if ((this.validityStart.isBefore(currentDate) || this.validityStart.equals(currentDate)) || (this.validityEnd.isAfter(currentDate) || this.validityEnd.equals(currentDate))) {
+            return true;
+        }
+        return false;
+    }
+
     public Long getRateId() {
         return rateId;
     }
@@ -220,5 +239,5 @@ public class Rate implements Serializable {
     public void setReservations(List<Reservation> reservations) {
         this.reservations = reservations;
     }
-    
+
 }

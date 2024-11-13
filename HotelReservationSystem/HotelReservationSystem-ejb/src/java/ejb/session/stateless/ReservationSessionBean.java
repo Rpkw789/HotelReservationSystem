@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entity.Guest;
 import entity.Reservation;
+import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -40,21 +41,23 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     }
 
     @Override
-    public Reservation createReservation(Reservation reservation, Long guestId) {
+    public Long createReservation(Reservation reservation, Long guestId) {
+        Guest guest = em.find(Guest.class, guestId);
+        reservation.setGuest(guest);
         em.persist(reservation);
         em.flush();
+        
+        reservation.getRoomType().getReservations().add(reservation);
 
-        Guest guest = em.find(Guest.class, guestId);
-
-        reservation.setGuest(guest);
         guest.getReservations().add(reservation);
-        return reservation;
+        reservation.getRoomType().getReservations().add(reservation);
+        return reservation.getReservationId();
     }
-    
+
     public Reservation getReservationById(Long reservationId) throws ReservationNotFoundException {
         Reservation reservation = em.find(Reservation.class, reservationId);
         if (reservation == null) {
-            throw new ReservationNotFoundException("Reservation with Id " + reservationId + " not found" );
+            throw new ReservationNotFoundException("Reservation with Id " + reservationId + " not found");
         }
         return reservation;
     }
