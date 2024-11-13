@@ -63,7 +63,9 @@ public class RoomType implements Serializable {
     
     @OneToMany(mappedBy = "roomType")
     private List<Reservation> reservations;
-   
+    
+    @OneToOne(optional = true)
+    private RoomType nextHigherRoomType;
     
     private boolean enabled = true;
 
@@ -255,6 +257,20 @@ public class RoomType implements Serializable {
      */
     public void setReservations(List<Reservation> reservations) {
         this.reservations = reservations;
+    }
+
+    /**
+     * @return the nextHigherRoomType
+     */
+    public RoomType getNextHigherRoomType() {
+        return nextHigherRoomType;
+    }
+
+    /**
+     * @param nextHigherRoomType the nextHigherRoomType to set
+     */
+    public void setNextHigherRoomType(RoomType nextHigherRoomType) {
+        this.nextHigherRoomType = nextHigherRoomType;
     }
 
 }

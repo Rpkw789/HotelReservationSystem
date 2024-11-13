@@ -5,6 +5,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -28,19 +30,19 @@ public class RoomAllocationExceptionRecord implements Serializable {
     private Long roomAllocationExceptionId;
     @Column(nullable = false)
     @NotNull
-    private Date date;
+    private LocalDate date;
+    @Column(nullable = false)
+    @NotBlank
+    private String description;
     
     // Relationships
     @OneToOne(optional = false)
     @JoinColumn(nullable = false)
     private Reservation affectedReservation;
-    
-    @OneToOne(optional = true)
-    @JoinColumn(nullable = true)
-    private Room givenRoom;
 
-    public RoomAllocationExceptionRecord(Date date) {
+    public RoomAllocationExceptionRecord(LocalDate date, String description) {
         this.date = date;
+        this.description = description;
     }
 
     public RoomAllocationExceptionRecord() {
@@ -83,14 +85,14 @@ public class RoomAllocationExceptionRecord implements Serializable {
     /**
      * @return the date
      */
-    public Date getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
     /**
      * @param date the date to set
      */
-    public void setDate(Date date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -108,18 +110,19 @@ public class RoomAllocationExceptionRecord implements Serializable {
         this.affectedReservation = affectedReservation;
     }
 
+
     /**
-     * @return the givenRoom
+     * @return the description
      */
-    public Room getGivenRoom() {
-        return givenRoom;
+    public String getDescription() {
+        return description;
     }
 
     /**
-     * @param givenRoom the givenRoom to set
+     * @param description the description to set
      */
-    public void setGivenRoom(Room givenRoom) {
-        this.givenRoom = givenRoom;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
 }
