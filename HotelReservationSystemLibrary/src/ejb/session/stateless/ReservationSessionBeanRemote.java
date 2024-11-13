@@ -18,7 +18,7 @@ public interface ReservationSessionBeanRemote {
 
     public List<Reservation> getReservationByPassportNumber(String passportNumber) throws ReservationNotFoundException;
 
-    public Reservation createReservation(Reservation reservation, Long guestId);
+    public Long createReservation(Reservation reservation, Long guestId);
     
     public Reservation getReservationById(Long reservationId) throws ReservationNotFoundException;
 }

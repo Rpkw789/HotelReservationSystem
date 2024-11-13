@@ -4,7 +4,9 @@
  */
 package ejb.session.stateless;
 
+import entity.Rate;
 import entity.RoomType;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import javafx.util.Pair;
@@ -16,5 +18,10 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface RoomAvailabilitySessionBeanRemote {
-    public List<Pair<RoomType, Integer>> getAvailableRoomTypeAndPrice(Date checkInDate, Date checkOutDate);
+
+    public List<Pair<RoomType, Integer>> getAvailableRoomTypeAndNumber(LocalDate checkInDate, LocalDate checkOutDate);
+
+    public double getCostWalkIn(LocalDate checkInDate, LocalDate checkOutDate, Long roomTypeId);
+
+    public List<Rate> getRateByRoomTypeWalkIn(Long roomTypeId);
 }

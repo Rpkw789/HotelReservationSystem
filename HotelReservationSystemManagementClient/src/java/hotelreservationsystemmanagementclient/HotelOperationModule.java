@@ -14,7 +14,9 @@ import ejb.session.stateless.RoomAvailabilitySessionBeanRemote;
 import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import entity.Employee;
+import entity.Guest;
 import entity.Rate;
+import entity.Reservation;
 import entity.Room;
 import entity.RoomType;
 import java.time.LocalDate;
@@ -22,10 +24,12 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import javafx.util.Pair;
 import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.RateTypeEnum;
 import util.enumeration.RoomAvailabilityStatusEnum;
 import util.enumeration.OperationalStatusEnum;
+import util.exception.GuestNotFoundException;
 import util.exception.RateExistsException;
 import util.exception.RateNotFoundException;
 import util.exception.RoomExistsException;
@@ -735,6 +739,9 @@ public class HotelOperationModule {
                     System.out.println("Error: Invalid Date");
                 }
             }
+        } else {
+            rate.setValidityStart(LocalDate.of(1900, 1, 1));
+            rate.setValidityEnd(LocalDate.of(2200, 1, 1));
         }
 
         try {
@@ -805,7 +812,7 @@ public class HotelOperationModule {
                         System.out.print("Rate Per Night > ");
                         rate.setRatePerNight(scanner.nextDouble());
                         scanner.nextLine();
-                    } else if (response == 5 && (rate.getRateType().equals(RateTypeEnum.PEAK) || rate.getRateType().equals(RateTypeEnum.PROMOTION)) ) {
+                    } else if (response == 5 && (rate.getRateType().equals(RateTypeEnum.PEAK) || rate.getRateType().equals(RateTypeEnum.PROMOTION))) {
                         while (true) {
                             System.out.print("Start Period (YYYY-MM-DD) > ");
                             String startDate = scanner.nextLine().trim();
@@ -831,6 +838,11 @@ public class HotelOperationModule {
                         }
                     } else if (response == 5 || response == 7) {
                         try {
+                            RateTypeEnum rateType = rate.getRateType();
+                            if (rateType.equals(RateTypeEnum.NORMAL) || rateType.equals(RateTypeEnum.PUBLISHED)) {
+                                rate.setValidityStart(LocalDate.of(1900, 1, 1));
+                                rate.setValidityEnd(LocalDate.of(2200, 1, 1));
+                            }
                             rateSessionBean.updateRate(rate);
                             System.out.println("Room Rate Updated");
                             return;
@@ -930,7 +942,8 @@ public class HotelOperationModule {
             System.out.println("Room Type: " + rate.getRoomType().getName());
             System.out.println("Rate Type: " + rate.getRateType());
             System.out.println("Rate Per Night: " + rate.getRatePerNight());
-            if (rate.getValidityStart() != null) {
+            RateTypeEnum rateType = rate.getRateType();
+            if (!rateType.equals(RateTypeEnum.NORMAL) && !rateType.equals(RateTypeEnum.PUBLISHED)) {
                 System.out.println("Start Period: " + rate.getValidityStart());
                 System.out.println("End Period: " + rate.getValidityEnd());
             }
@@ -971,7 +984,55 @@ public class HotelOperationModule {
     }
 
     private void doWalkInSearchReserveRoom() {
-        System.out.println("doWalkInSearchReserveRoom");
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("*Walk In Search & Reserve Room*");
+        System.out.print("Enter Check-In Date (YYYY-MM-DD) > ");
+        LocalDate startDate = LocalDate.parse(scanner.nextLine().trim());
+        System.out.print("Enter Check-Out Date (YYYY-MM-DD) > ");
+        LocalDate endDate = LocalDate.parse(scanner.nextLine().trim());
+
+        List<Pair<RoomType, Integer>> roomTypesAndNumber = roomAvailabilitySessionBean.getAvailableRoomTypeAndNumber(startDate, endDate);
+        System.out.println("Available Room Types and Quantity");
+        for (int i = 0; i < roomTypesAndNumber.size(); i++) {
+            Pair<RoomType, Integer> pair = roomTypesAndNumber.get(i);
+            double cost = roomAvailabilitySessionBean.getCostWalkIn(startDate, endDate, pair.getKey().getRoomTypeId());
+            System.out.println((i + 1) + ": Room Type = " + pair.getKey().getName() + ", Quantity = " + pair.getValue() + ", Cost = " + cost);
+        }
+        int exit = roomTypesAndNumber.size() + 1;
+        System.out.println(exit + ": Exit");
+        System.out.println("Choose Room Type");
+
+        int response = scanner.nextInt();
+        scanner.nextLine();
+        if (response == exit) {
+            return;
+        }
+        Pair<RoomType, Integer> chosenPair = roomTypesAndNumber.get(response - 1);
+        double cost = roomAvailabilitySessionBean.getCostWalkIn(startDate, endDate, chosenPair.getKey().getRoomTypeId());
+
+        System.out.print("Number of Rooms > ");
+        int numberOfRooms = scanner.nextInt();
+        scanner.nextLine();
+        Reservation reservation = new Reservation(numberOfRooms, cost, false, startDate, endDate, chosenPair.getKey());
+        List<Rate> usedRates = roomAvailabilitySessionBean.getRateByRoomTypeWalkIn(chosenPair.getKey().getRoomTypeId());
+        reservation.setRates(usedRates);
+
+        while (true) {
+            System.out.print("Guest Username > ");
+            String username = scanner.nextLine().trim();
+
+            try {
+                Guest guest = guestSessionBean.getGuestByUsername(username);
+                Long reservationId = reservationSessionBean.createReservation(reservation, guest.getGuestId());
+                System.out.println("Reservation made with reservation id " + reservationId);
+                return;
+            } catch (GuestNotFoundException ex) {
+                System.out.println("Error: " + ex.getMessage());
+                System.out.println("Input Again");
+            }
+        }
+
     }
 
     private void doCheckInGuest() {
