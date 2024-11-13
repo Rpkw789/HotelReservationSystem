@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entity.Reservation;
 import entity.RoomType;
+import java.time.LocalDate;
 import javax.ejb.Remote;
 
 /**
@@ -15,4 +16,6 @@ import javax.ejb.Remote;
 @Remote
 public interface RoomAllocationSessionBeanRemote {
     public void allocateWalkInRoom(RoomType roomType, Reservation reservation);
+    
+        public void allocateDailyReservation(LocalDate currentDate);
 }
