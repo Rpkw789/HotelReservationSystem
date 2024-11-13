@@ -1045,6 +1045,12 @@ public class HotelOperationModule {
 
     ///////////ALLOCATE ROOM TO CURRENT DAY RESERVATION/////////////
     private void doAllocateRoomToCurrentDayReservation() {
-        System.out.println("TO-DO: doAllocateRoomToCurrentDayReservation");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*Allocate Room To Current Date Reservation*");
+        System.out.print("Current Date > ");
+        String date = scanner.nextLine().trim();
+        LocalDate currentDate = LocalDate.parse(date);
+        
+        
     }
 }
