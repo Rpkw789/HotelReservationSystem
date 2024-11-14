@@ -29,9 +29,9 @@ public interface PartnerSessionBeanRemote {
     public List<Partner> getAllPartners();
 
     public Partner getPartnerByUsername(String username) throws PartnerNotFoundException;
-    public Guest createPartnerAccount(Guest g) throws PartnerAccountExistsException;
+    public Long createPartnerAccount(Guest g, Long partnerId) throws PartnerAccountExistsException;
     public boolean isUniqueGuestUsername(String username);
     public Guest getPartnerAccountByUsername(String username) throws GuestNotFoundException;
     public List<Reservation> retrieveAllReservations(Partner p);
-    public void logInPartnerAccount(String username, String password) throws InvalidCredentialException;
+    public Long logInPartnerAccount(String username, String password) throws InvalidCredentialException;
 }
