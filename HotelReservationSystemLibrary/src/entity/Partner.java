@@ -56,7 +56,7 @@ public class Partner implements Serializable {
     
     // Relationships
     @OneToMany
-    @JoinColumn(name = "partner_id")
+    @JoinColumn(name = "partner")
     private List<Guest> guests;
     
     private PartnerRoleEnum role;

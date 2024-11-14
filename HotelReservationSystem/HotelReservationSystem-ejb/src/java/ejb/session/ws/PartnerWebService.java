@@ -15,6 +15,7 @@ import entity.Reservation;
 import entity.Room;
 import entity.RoomType;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import javafx.util.Pair;
 import javax.ejb.EJB;
@@ -24,6 +25,7 @@ import javax.jws.WebParam;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import util.exception.GuestNotFoundException;
 import util.exception.InvalidCredentialException;
 import util.exception.PartnerExistsException;
@@ -73,6 +75,7 @@ public class PartnerWebService {
             for (Guest g : guests) {
                 em.detach(g);
                 g.setReservations(null);
+                g.setPartner(null);
             }
             return p;
         } catch (PartnerNotFoundException ex) {
@@ -96,6 +99,18 @@ public class PartnerWebService {
         return reservations;
     }
 
+    @WebMethod(operationName = "getCheckInDate")
+    public String getCheckInDate(@WebParam(name = "reservationId") Long reservationId) throws ReservationNotFoundException {
+        Reservation r = reservationSessionBeanLocal.getReservationById(reservationId);
+        return r.getCheckInDate().toString();
+    }
+
+    @WebMethod(operationName = "getCheckOutDate")
+    public String getCheckOutDate(@WebParam(name = "reservationId") Long reservationId) throws ReservationNotFoundException {
+        Reservation r = reservationSessionBeanLocal.getReservationById(reservationId);
+        return r.getCheckOutDate().toString();
+    }
+
     @WebMethod(operationName = "getReservationById") //retrieve particular reservation from the id
     public Reservation getReservationById(@WebParam(name = "reservationId") Long reservationId) throws ReservationNotFoundException {
         Reservation r = reservationSessionBeanLocal.getReservationById(reservationId);
@@ -115,6 +130,7 @@ public class PartnerWebService {
         Guest g = r.getGuest();
         em.detach(g);
         g.setReservations(null);
+        g.setPartner(null);
 
         return r;
     }
@@ -132,53 +148,94 @@ public class PartnerWebService {
             r.setGuest(null);
         }
         return reservations;
-        
+
     }
 
-    @WebMethod(operationName="getAvailableRoomTypeAndNumber")
-    public List<Pair<RoomType, Integer>> getAvailableRoomTypeAndNumber(@WebParam(name="checkInDate")LocalDate checkInDate, @WebParam(name ="checkOutDate")LocalDate checkOutDate) {
-        List<Pair<RoomType, Integer>> listOfRoomTypesAndNumbers = roomAvailabilitySessionBean.getAvailableRoomTypeAndNumber(checkInDate, checkOutDate);
-        
-        for (Pair<RoomType, Integer> pair : listOfRoomTypesAndNumbers) {
-            RoomType rt = pair.getKey();
+    @WebMethod(operationName = "getRoomTypes")
+    public List<RoomType> getRoomTypes() {
+        Query query = em.createQuery("SELECT rt FROM RoomType rt");
+        List<RoomType> list = query.getResultList();
+        for (RoomType rt : list) {
             em.detach(rt);
             rt.setNextHigherRoomType(null);
+            rt.setReservations(null);
             rt.setRates(null);
             rt.setRooms(null);
-            rt.setReservations(null);
         }
-        
-        return listOfRoomTypesAndNumbers;
+        return list;
     }
 
-    @WebMethod(operationName="createReservation")
-    public Long createReservation(@WebParam(name = "reservation")Reservation reservation, @WebParam(name="guestId")Long guestId) {
-        Long reservationId = reservationSessionBeanLocal.createReservation(reservation, guestId);
+    @WebMethod(operationName = "getAvailableNumber")
+    public Integer getAvailableNumber(@WebParam(name = "checkInDate") String checkIn, @WebParam(name = "checkOutDate") String checkOut, @WebParam(name = "roomTypeId") Long roomTypeId) {
+        LocalDate checkInDate = LocalDate.parse(checkIn);
+        LocalDate checkOutDate = LocalDate.parse(checkOut);
+
+        List<Pair<RoomType, Integer>> listOfRoomTypesAndNumbers = roomAvailabilitySessionBean.getAvailableRoomTypeAndNumber(checkInDate, checkOutDate);
+
+        for (Pair<RoomType, Integer> pair : listOfRoomTypesAndNumbers) {
+            if (roomTypeId == pair.getKey().getRoomTypeId()) {
+                return pair.getValue();
+            }
+        }
+
+        return 0;
+    }
+
+    @WebMethod(operationName = "createReservation")
+    public Long createReservation(@WebParam(name = "numberOfRooms") int numberOfRooms, @WebParam(name = "fee") double fee, @WebParam(name = "roomType") Long roomTypeId, @WebParam(name = "guestId") Long guestId, @WebParam(name = "checkInDate") String checkIn, @WebParam(name = "checkOutDate") String checkOut, @WebParam(name = "usedRates") List<Long> usedRates) {
+        System.out.println("HELPEFLPALDSPDA");
+        LocalDate checkInDate = LocalDate.parse(checkIn); // This might fail if the format is incorrect
+        LocalDate checkOutDate = LocalDate.parse(checkOut); // Same here
+        
+        RoomType roomType = em.find(RoomType.class, roomTypeId);
+        List<Rate> list = new ArrayList<Rate>();
+        for(Long rateId : usedRates) {
+            list.add(em.find(Rate.class, rateId));
+        }
+
+        // Proceed with creating reservation
+        Reservation actualReservation = new Reservation(numberOfRooms, fee, false, checkInDate, checkOutDate, roomType);
+        actualReservation.setRates(list);
+
+        Long reservationId = reservationSessionBeanLocal.createReservation(actualReservation, guestId);
         return reservationId;
     }
 
-
-    @WebMethod(operationName="createGuestForPartner")
-    public Long createGuestForPartner(Guest guest, Long partnerId) throws PartnerAccountExistsException {
-        return partnerSessionBeanLocal.createPartnerAccount(guest, partnerId); 
+    @WebMethod(operationName = "createGuestForPartner")
+    public Long createGuestForPartner(@WebParam(name = "name") String name, @WebParam(name = "username") String username, @WebParam(name = "password") String password, @WebParam(name = "email") String email, @WebParam(name = "mobileNumber") String mobileNumber, @WebParam(name = "passportNumber") String passportNumber, @WebParam(name = "partnerId") Long partnerId) throws PartnerAccountExistsException {
+        Guest guest = new Guest(name, username, password, email, mobileNumber, passportNumber);
+        return partnerSessionBeanLocal.createPartnerAccount(guest, partnerId);
 
     }
 
     @WebMethod(operationName = "logInPartnerAccount")
-    public Long logInPartnerAccount(@WebParam(name = "username") String username, @WebParam(name = "password") String password) throws InvalidCredentialException {
-        return partnerSessionBeanLocal.logInPartnerAccount(username, password);
+    public Long logInPartnerAccount(@WebParam(name = "username") String username, @WebParam(name = "partnerId") Long partnerId) throws InvalidCredentialException {
+        try {
+            Guest guest = guestSessionBean.getGuestByUsername(username);
+            if(guest.getPartner().equals(em.find(Partner.class, partnerId))) {
+                return guest.getGuestId();
+            } else {
+                throw new InvalidCredentialException("Guest is not associated with Partner" + partnerId);
+            }
+        } catch (GuestNotFoundException ex) {
+            throw new InvalidCredentialException(ex.getMessage());
+        }
+
     }
-    
+
     @WebMethod(operationName = "getRatesUsed")
-    public List<Rate> getRatesUsed(@WebParam(name="startDate")LocalDate startDate, @WebParam(name="endDate")LocalDate endDate, @WebParam(name="roomTypeId")Long roomTypeId) {
-        List<Rate> ratesUse = roomAvailabilitySessionBean.getRateByRoomType(startDate, endDate, roomTypeId);
-        
-        for (Rate r : ratesUse){
+    public List<Rate> getRatesUsed(@WebParam(name = "checkInDate") String checkIn, @WebParam(name = "checkOutDate") String checkOut, @WebParam(name = "roomTypeId") Long roomTypeId) {
+        LocalDate checkInDate = LocalDate.parse(checkIn);
+        LocalDate checkOutDate = LocalDate.parse(checkOut);
+
+        List<Rate> ratesUse = roomAvailabilitySessionBean.getRateByRoomType(checkInDate, checkOutDate, roomTypeId);
+
+        for (Rate r : ratesUse) {
             em.detach(r);
             r.setReservations(null);
             r.setRoomType(null);
         }
-        
+
         return ratesUse;
 
     }
