@@ -135,12 +135,12 @@ public class PartnerWebService {
     }
     
     public Long createGuestForPartner(Guest guest, Long partnerId) {
-        partnerSessionBeanLocal.createPartnerAccount(guest); // ADD PARTNERID INTO INPUT FOR ASSOCIATION
+        //partnerSessionBeanLocal.createPartnerAccount(guest); // ADD PARTNERID INTO INPUT FOR ASSOCIATION
         return null;
     }
     
     public Guest getGuestByUsername(String username, String password) {
-        guestSessionBean.getGuestByUsername(username);
+        //guestSessionBean.getGuestByUsername(username);
         return null;
     }
 }
