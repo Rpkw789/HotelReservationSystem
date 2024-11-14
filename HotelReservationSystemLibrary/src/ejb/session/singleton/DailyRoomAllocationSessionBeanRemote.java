@@ -13,5 +13,5 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface DailyRoomAllocationSessionBeanRemote {
-    public void allocateReservedRoom(Date date);
+    public void allocateReservedRoom();
 }

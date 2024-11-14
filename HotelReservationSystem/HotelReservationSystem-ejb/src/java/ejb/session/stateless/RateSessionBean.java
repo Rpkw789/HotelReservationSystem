@@ -36,6 +36,11 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
             em.persist(newRate);
             em.flush();
             
+            if(newRate.getRateType().equals(RateTypeEnum.NORMAL) || newRate.getRateType().equals(RateTypeEnum.PUBLISHED)) {
+                newRate.setValidityStart(LocalDate.of(1900,1,1));
+                newRate.setValidityEnd(LocalDate.of(2200,1,1));
+            }
+            
             RoomType roomType = newRate.getRoomType();
             roomType.getRates().add(newRate);
             return newRate.getRateId();

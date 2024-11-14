@@ -14,6 +14,6 @@ import javax.ejb.Local;
 @Local
 public interface DailyRoomAllocationSessionBeanLocal {
 
-    public void allocateReservedRoom(Date date);
+    public void allocateReservedRoom();
     
 }
