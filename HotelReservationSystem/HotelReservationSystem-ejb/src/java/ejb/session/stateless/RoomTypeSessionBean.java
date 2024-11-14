@@ -74,6 +74,9 @@ public class RoomTypeSessionBean implements RoomTypeSessionBeanRemote, RoomTypeS
         if (roomtype == null) {
             throw new RoomTypeNotFoundException("Room type does not exist!");
         } else {
+            if(!roomtype.getRooms().isEmpty()) {
+                roomtype.setEnabled(false);
+            }
             em.remove(roomtype);
         }
     }

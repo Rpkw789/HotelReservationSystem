@@ -25,6 +25,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 import javafx.util.Pair;
 import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.RateTypeEnum;
@@ -32,6 +33,7 @@ import util.enumeration.RoomAvailabilityStatusEnum;
 import util.enumeration.OperationalStatusEnum;
 import util.exception.CheckInException;
 import util.exception.CheckOutException;
+import util.exception.GuestExistsException;
 import util.exception.GuestNotFoundException;
 import util.exception.RateExistsException;
 import util.exception.RateNotFoundException;
@@ -98,6 +100,7 @@ public class HotelOperationModule {
     private void processResponse(int response, int dailyAllocationNumber) {
         if (response == dailyAllocationNumber) {
             doAllocateRoomToCurrentDayReservation();
+            return;
         }
         for (InputNumberRolePair pair : inputNumberRolePairList) {
             if (pair.getNumber() == response) {
@@ -244,7 +247,7 @@ public class HotelOperationModule {
         RoomType roomType = new RoomType(name, description, size, bed, capacity);
 
         while (!filteredRoomTypes.isEmpty()) {
-            System.out.println("Choose Room Type");
+            System.out.println("Choose Next Higher Room Type");
             for (int i = 0; i < filteredRoomTypes.size(); i++) {
                 System.out.println((i + 1) + ": " + filteredRoomTypes.get(i).getName());
             }
@@ -323,7 +326,13 @@ public class HotelOperationModule {
             System.out.println("5: Capacity: " + roomType.getCapacity());
             String amenities = roomType.getAmenities().toString();
             System.out.println("6: Amenities: " + amenities.substring(1, amenities.length() - 1));
-            System.out.println("7: Exit");
+            if (roomType.getNextHigherRoomType() == null) {
+                System.out.println("7: Next Higher Room Type: None");
+            } else {
+                System.out.println("7: Next Higher Room Type: " + roomType.getNextHigherRoomType().getName());
+            }
+
+            System.out.println("8: Exit");
 
             int response1 = scanner.nextInt();
             scanner.nextLine();
@@ -359,6 +368,26 @@ public class HotelOperationModule {
                 }
                 roomType.setAmenities(newAmenities);
             } else if (response1 == 7) {
+
+                System.out.println("Choose Next Higher Room Type");
+                for (int i = 0; i < roomTypes.size(); i++) {
+                    System.out.println((i + 1) + ": " + roomTypes.get(i).getName());
+                }
+                System.out.println((roomTypes.size() + 1) + ": NIL");
+                int response2 = scanner.nextInt();
+                scanner.nextLine();
+                if (response2 == roomTypes.size() + 1) {
+                    break;
+                }
+
+                RoomType nextHigherRoomType = roomTypes.get(response2 - 1);
+                if (roomType.equals(nextHigherRoomType)) {
+                    System.out.println("Not Allowed to Choose Itself");
+                    continue;
+                }
+                roomType.setNextHigherRoomType(nextHigherRoomType);
+
+            } else if (response1 == 8) {
                 break;
             } else {
                 System.out.println("");
@@ -679,9 +708,9 @@ public class HotelOperationModule {
         System.out.println("*View Room Allocation Exception Report*");
         System.out.print("Enter Date > ");
         LocalDate date = LocalDate.parse(scanner.nextLine().trim());
-        
+
         List<RoomAllocationExceptionRecord> records = roomAllocationSessionBean.getRoomAllocationExceptionRecord(date);
-        for(RoomAllocationExceptionRecord record : records) {
+        for (RoomAllocationExceptionRecord record : records) {
             System.out.println("Record " + record.getRoomAllocationExceptionId());
             System.out.println("    Reservation Id: " + record.getAffectedReservation().getReservationId());
             System.out.println("    Description: " + record.getDescription());
@@ -853,38 +882,38 @@ public class HotelOperationModule {
                         scanner.nextLine();
                     } else if (response == 5 && (rate.getRateType().equals(RateTypeEnum.PEAK) || rate.getRateType().equals(RateTypeEnum.PROMOTION))) {
                         LocalDate start = null;
-                        while (start==null|| !start.isBefore(rate.getValidityEnd())) {
+                        while (start == null || !start.isBefore(rate.getValidityEnd())) {
                             System.out.print("Start Period (YYYY-MM-DD) > ");
                             String startDate = scanner.nextLine().trim();
                             try {
                                 start = LocalDate.parse(startDate);
-                                if (!start.isBefore(rate.getValidityEnd())){
+                                if (!start.isBefore(rate.getValidityEnd())) {
                                     System.out.println("Error: Start date must be before end date");
-                                    start=null;
+                                    start = null;
                                 } else {
                                     rate.setValidityStart(start);
                                     break;
                                 }
-                                
+
                             } catch (DateTimeParseException ex) {
                                 System.out.println("Error: Invalid Date");
                             }
                         }
                     } else if (response == 6 && (rate.getRateType().equals(RateTypeEnum.PEAK) || rate.getRateType().equals(RateTypeEnum.PROMOTION))) {
                         LocalDate end = null;
-                        while (end==null || !end.isAfter(rate.getValidityStart())) {
+                        while (end == null || !end.isAfter(rate.getValidityStart())) {
                             System.out.print("End Period (YYYY-MM-DD) > ");
                             String endDate = scanner.nextLine().trim();
                             try {
                                 end = LocalDate.parse(endDate);
-                                if (!end.isAfter(rate.getValidityStart())){
+                                if (!end.isAfter(rate.getValidityStart())) {
                                     System.out.println("Error: End date must be after start date");
-                                    end=null;
+                                    end = null;
                                 } else {
                                     rate.setValidityEnd(end);
                                     break;
                                 }
-                                
+
                             } catch (DateTimeParseException ex) {
                                 System.out.println("Error: Invalid Date");
                             }
@@ -1059,9 +1088,9 @@ public class HotelOperationModule {
             date = scanner.nextLine().trim();
             try {
                 endDate = LocalDate.parse(date);
-                if (!endDate.isAfter(startDate)){
+                if (!endDate.isAfter(startDate)) {
                     System.out.println("Error: Check-out date must be after the check-in date");
-                    endDate =null;
+                    endDate = null;
                 }
             } catch (DateTimeParseException ex) {
                 System.out.println("Error: Invalid date");
@@ -1087,19 +1116,31 @@ public class HotelOperationModule {
         Pair<RoomType, Integer> chosenPair = roomTypesAndNumber.get(response - 1);
         double cost = roomAvailabilitySessionBean.getCostWalkIn(startDate, endDate, chosenPair.getKey().getRoomTypeId());
 
-        System.out.print("Number of Rooms > ");
-        int numberOfRooms = scanner.nextInt();
-        scanner.nextLine();
+        int numberOfRooms = 0;
+        while (true) {
+            System.out.print("Number of Rooms > ");
+            numberOfRooms = scanner.nextInt();
+            scanner.nextLine();
+            if(numberOfRooms > chosenPair.getValue()) {
+                System.out.println("Insufficient Rooms. Input Again");
+            } else {
+                break;
+            }
+        }
+
         Reservation reservation = new Reservation(numberOfRooms, cost * numberOfRooms, false, startDate, endDate, chosenPair.getKey());
         List<Rate> usedRates = roomAvailabilitySessionBean.getRateByRoomTypeWalkIn(chosenPair.getKey().getRoomTypeId());
         reservation.setRates(usedRates);
 
-        while (true) {
-            System.out.print("Guest Username > ");
-            String username = scanner.nextLine().trim();
+        System.out.println("Choose an Option:");
+        System.out.println("1: Register Guest");
+        System.out.println("2: Log In Guest");
+        int response1 = scanner.nextInt();
+        scanner.nextLine();
 
+        if (response1 == 1) {
             try {
-                Guest guest = guestSessionBean.getGuestByUsername(username);
+                Guest guest = guestSessionBean.getGuestByUsername(doRegister());
                 Long reservationId = reservationSessionBean.createReservation(reservation, guest.getGuestId());
                 System.out.println("Reservation made with reservation id " + reservationId);
                 return;
@@ -1107,8 +1148,103 @@ public class HotelOperationModule {
                 System.out.println("Error: " + ex.getMessage());
                 System.out.println("Input Again");
             }
+        } else {
+            while (true) {
+                System.out.print("Guest Username > ");
+                String username = scanner.nextLine().trim();
+
+                try {
+                    Guest guest = guestSessionBean.getGuestByUsername(username);
+                    Long reservationId = reservationSessionBean.createReservation(reservation, guest.getGuestId());
+                    System.out.println("Reservation made with reservation id " + reservationId);
+                    return;
+                } catch (GuestNotFoundException ex) {
+                    System.out.println("Error: " + ex.getMessage());
+                    System.out.println("Input Again");
+                }
+            }
         }
 
+    }
+
+    private String doRegister() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("");
+        System.out.println("*Register*");
+        System.out.println("Please enter your name > ");
+        String name = scanner.nextLine().trim();
+
+        String username = "";
+        String userPattern = "^[A-Za-z0-9]*$";
+        while (username.equals("")) {
+            System.out.print("Please enter your username > ");
+            username = scanner.nextLine().trim();
+            if (username.length() < 5) {
+                System.out.println("Error: username is too short, it must have a min of 5 characters!");
+                username = "";
+            }
+            if (username.length() > 20) {
+                System.out.println("Error: username is too long, it must have a max of 20 characters!");
+                username = "";
+            }
+            if (!Pattern.matches(userPattern, username)) {
+                System.out.println("Error: Username invalid");
+                username = "";
+            }
+        }
+
+        String password = "";
+        while (password.equals("")) {
+            System.out.print("Please enter your password > ");
+            password = scanner.nextLine().trim();
+            if (password.length() < 5) {
+                System.out.println("Error: password is too short, it must have a min of 5 characters!");
+                password = "";
+            }
+            if (password.length() > 20) {
+                System.out.println("Error: password is too long, it must have a max of 20 characters!");
+                password = "";
+            }
+        }
+
+        System.out.print("Please enter your email >");
+        String email = scanner.nextLine().trim();
+
+        String number;
+        String phonePattern = "\\d+";
+        System.out.print("Please enter your phone number >");
+        while (true) {
+            number = scanner.nextLine().trim();
+            if (Pattern.matches(phonePattern, number)) {
+                break;
+            } else {
+                System.out.println("Invalid phone number. Please try again.");
+                System.out.print("> ");
+            }
+        }
+
+        String passportNum;
+        String passportPattern = "^[A-Z0-9]{9}$";
+        System.out.print("Please enter your passport number > ");
+        while (true) {
+            passportNum = scanner.nextLine().trim();
+            if (Pattern.matches(passportPattern, passportNum)) {
+                break;
+            } else {
+                System.out.println("Invalid passport number. Please try again.");
+                System.out.print("> ");
+            }
+        }
+
+        Guest newGuest = new Guest(name, username, password, email, number, passportNum);
+        try {
+            Guest g = guestSessionBean.createNewGuest(newGuest);
+            System.out.println("Your account has been created successfully!");
+        } catch (GuestExistsException ex) {
+            System.out.println("You have an existing account with us, please log in instead");
+        }
+
+        return username;
     }
 
     private void doCheckInGuest() {
@@ -1144,8 +1280,8 @@ public class HotelOperationModule {
                 checkInOutSessionBean.checkIn(reservation.getReservationId());
                 System.out.println("Rooms Allocated:");
                 List<Room> rooms = reservation.getGivenRooms();
-                
-                for(Room room : rooms) {
+
+                for (Room room : rooms) {
                     System.out.println("    " + room.getRoomNumber());
                 }
             } catch (CheckInException ex) {
@@ -1200,10 +1336,10 @@ public class HotelOperationModule {
     private void doAllocateRoomToCurrentDayReservation() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("*Allocate Room To Current Date Reservation*");
-        String date="";
+        String date = "";
         LocalDate currentDate = null;
-        
-        while (currentDate==null){
+
+        while (currentDate == null) {
             System.out.print("Current Date > ");
             date = scanner.nextLine().trim();
             try {
@@ -1212,7 +1348,7 @@ public class HotelOperationModule {
                 System.out.println("Error: Invalid date. Please enter check-in date again");
             }
         }
-        
+
         roomAllocationSessionBean.allocateDailyReservation(currentDate);
         System.out.println("Allocated Rooms for " + date);
     }

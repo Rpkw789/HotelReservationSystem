@@ -8,6 +8,7 @@ import ejb.session.stateless.EmployeeSessionBeanRemote;
 import ejb.session.stateless.PartnerSessionBeanRemote;
 import entity.Employee;
 import entity.Partner;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import util.enumeration.EmployeeRoleEnum;
@@ -105,6 +106,27 @@ public class SystemAdministrationModule {
         }
 
         Employee newEmployee = new Employee(username, password, name);
+        ArrayList<EmployeeRoleEnum> roles = new ArrayList<EmployeeRoleEnum>();
+        EmployeeRoleEnum[] rolesies = EmployeeRoleEnum.values();
+        for (EmployeeRoleEnum role : rolesies) {
+            roles.add(role);
+        }
+        while (true) {
+            System.out.println("Choose Rights");
+            for (int i = 0; i < roles.size(); i++) {
+                System.out.println((i + 1) + ": " + roles.get(i));
+            }
+            System.out.println((roles.size() + 1) + ": Done");
+            int response = scanner.nextInt();
+            scanner.nextLine();
+            if (response == roles.size() + 1) {
+                break;
+            } else {
+                EmployeeRoleEnum role = roles.get(response - 1);
+                newEmployee.getEmployeeRoles().add(role);
+                roles.remove(role);
+            }
+        }
         try {
             Long employeeId = employeeSessionBean.createNewEmployee(newEmployee);
             System.out.println("");
@@ -186,7 +208,18 @@ public class SystemAdministrationModule {
             }
         }
 
-        Partner partner = new Partner(username, password, organisationName, email, mobileNumber, PartnerRoleEnum.PARTNER_RESERVATION_MANAGER);
+        System.out.println("Choose Role");
+        System.out.println("1: Employee");
+        System.out.println("2: Manager");
+        int response = scanner.nextInt();
+        scanner.nextLine();
+        Partner partner = null;
+        if (response == 1) {
+            partner = new Partner(username, password, organisationName, email, mobileNumber, PartnerRoleEnum.PARTNER_EMPLOYEE);
+        } else {
+            partner = new Partner(username, password, organisationName, email, mobileNumber, PartnerRoleEnum.PARTNER_RESERVATION_MANAGER);
+        }
+
         try {
             Long partnerId = partnerSessionBean.createNewPartner(partner);
             System.out.println("");
