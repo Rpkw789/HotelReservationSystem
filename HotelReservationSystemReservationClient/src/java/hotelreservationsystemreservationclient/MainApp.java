@@ -11,6 +11,7 @@ import ejb.session.stateless.RoomSessionBeanRemote;
 import ejb.session.stateless.RoomTypeSessionBeanRemote;
 import entity.Guest;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 import util.exception.GuestExistsException;
 import util.exception.GuestNotFoundException;
 import util.exception.InvalidCredentialException;
@@ -55,7 +56,7 @@ public class MainApp {
                     guestModule = new GuestModule(roomTypeSessionBean, roomSessionBean, reservationSessionBean, guestSessionBean, guest, roomAvailabilitySessionBean);
                     guestModule.mainMenu();
                 } catch (InvalidCredentialException ex) {
-                    ex.getMessage();
+                    System.out.println(ex.getMessage());
                 }
             } else if (response == 2) {
                 doRegister();
@@ -83,9 +84,11 @@ public class MainApp {
             guest = guestSessionBean.getGuestByUsername(username);
             if (!guest.getPassword().equals(password)) {
                 throw new InvalidCredentialException("Wrong password!");
+            } else {
+                System.out.println("Login successful!");
             }
         } catch (GuestNotFoundException ex) {
-            System.out.println("You do not have a guest account with us, please register instead");
+            throw new InvalidCredentialException("You do not have a guest account with us, please register instead");
         }
     }
 
@@ -93,24 +96,71 @@ public class MainApp {
         Scanner scanner = new Scanner(System.in);
         System.out.println("");
         System.out.println("*Register*");
-        System.out.println("Please enter your name");
-        System.out.print("> ");
+        System.out.println("Please enter your name > ");
         String name = scanner.nextLine().trim();
-        System.out.println("Please enter your username");
-        System.out.print("> ");
-        String username = scanner.nextLine().trim();
-        System.out.println("Please enter your password");
-        System.out.print("> ");
-        String password = scanner.nextLine().trim();
-        System.out.println("Please enter your email");
-        System.out.print("> ");
+        
+        String username = "";
+        String userPattern ="^[A-Za-z0-9]*$";
+        while (username.equals("")){
+            System.out.print("Please enter your username > ");
+            username=scanner.nextLine().trim();
+            if (username.length()<5){
+                System.out.println("Error: username is too short, it must have a min of 5 characters!");
+                username="";
+            }
+            if (username.length()>20){
+                System.out.println("Error: username is too long, it must have a max of 20 characters!");
+                username="";
+            }
+            if(!Pattern.matches(userPattern, username)){
+                System.out.println("Error: Username invalid");
+                username="";
+            }
+        }
+        
+        String password="";
+        while (password.equals("")){
+            System.out.print("Please enter your password > ");
+            password=scanner.nextLine().trim();
+            if (password.length()<5){
+                System.out.println("Error: password is too short, it must have a min of 5 characters!");
+                password="";
+            } 
+            if (password.length()>20){
+                System.out.println("Error: password is too long, it must have a max of 20 characters!");
+                password="";
+            }
+        }
+        
+        System.out.print("Please enter your email >");
         String email = scanner.nextLine().trim();
-        System.out.println("Please enter your phone number");
-        System.out.print("> ");
-        String number = scanner.nextLine().trim();
-        System.out.println("Please enter your passport number");
-        System.out.print("> ");
-        String passportNum = scanner.nextLine().trim();
+        
+        String number;
+        String phonePattern = "\\d+"; 
+        System.out.print("Please enter your phone number >");
+        while (true){
+            number=scanner.nextLine().trim();
+            if (Pattern.matches(phonePattern, number)){
+                break;
+            } else {
+                System.out.println("Invalid phone number. Please try again.");
+                System.out.print("> ");
+            }
+        }
+        
+        String passportNum;
+        String passportPattern = "^[A-Z0-9]{9}$";
+        System.out.print("Please enter your passport number > ");
+        while (true){
+            passportNum = scanner.nextLine().trim();
+            if (Pattern.matches(passportPattern, passportNum)) {
+                break;
+            } else {
+                System.out.println("Invalid passport number. Please try again.");
+                System.out.print("> ");
+            }
+        }
+
 
         Guest newGuest = new Guest(name, username, password, email, number, passportNum);
         try {

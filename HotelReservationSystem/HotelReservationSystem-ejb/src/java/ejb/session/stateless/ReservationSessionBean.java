@@ -7,6 +7,7 @@ package ejb.session.stateless;
 import entity.Guest;
 import entity.Rate;
 import entity.Reservation;
+import entity.RoomType;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         reservation.setGuest(guest);
         List<Rate> detachedRates = reservation.getRates();
         reservation.setRates(new ArrayList<Rate>());
+        
+        reservation.setRoomType(em.find(RoomType.class, reservation.getRoomType().getRoomTypeId()));
 
         em.persist(reservation);
         em.flush();
