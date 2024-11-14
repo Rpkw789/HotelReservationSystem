@@ -42,8 +42,9 @@ public class RoomAllocationSessionBean implements RoomAllocationSessionBeanRemot
         Query query = em.createQuery("SELECT r FROM Reservation r");
         List<Reservation> allReservations = query.getResultList();
         List<Reservation> currentDayReservations = new ArrayList<Reservation>();
-        allReservations.stream().filter(r -> r.getCheckInDate().equals(currentDate)).forEach(r -> currentDayReservations.add(r));
-
+        allReservations.stream().filter(r -> r.getCheckInDate().equals(currentDate) && r.getGivenRooms().size() != r.getNumberOfRooms()).forEach(r -> currentDayReservations.add(r));
+        // r.getGivenRooms().size() == r.getNumberOfRooms()
+        System.out.println("RESERVATIONS: " + currentDayReservations); //////////////
         Set<RoomType> involvedRoomTypes = new HashSet<RoomType>();
         for (Reservation reservation : currentDayReservations) {
             involvedRoomTypes.add(reservation.getRoomType());
@@ -65,7 +66,8 @@ public class RoomAllocationSessionBean implements RoomAllocationSessionBeanRemot
                 Reservation reservation = reservationsForThisRoomType.get(reservationCounter);
                 int numberOfRooms = reservation.getNumberOfRooms();
 
-                for (int i = 0; i < numberOfRooms; i++) {
+                System.out.println("RESERVATION:" + reservation);
+                for (int i = reservation.getGivenRooms().size(); i < numberOfRooms; i++) { //int i = 0;
                     Room room = availableRooms.get(roomCounter);
 
                     room.setReservation(reservation);
@@ -78,6 +80,8 @@ public class RoomAllocationSessionBean implements RoomAllocationSessionBeanRemot
                 }
                 reservationCounter++;
             }
+            
+            System.out.println("RESERVATION COUNTER: " + reservationCounter + ", ROOM COUNTER: " + roomCounter);
 
             // EXCEPTIONS
             List<RoomType> filteredRoomType = new ArrayList<RoomType>();
@@ -122,6 +126,17 @@ public class RoomAllocationSessionBean implements RoomAllocationSessionBeanRemot
                 }
             }
         }
+    }
+    
+    public List<RoomAllocationExceptionRecord> getRoomAllocationExceptionRecord(LocalDate date) {
+        Query query = em.createQuery("SELECT r FROM RoomAllocationExceptionRecord r WHERE r.date = :date");
+        query.setParameter("date", date);
+        List<RoomAllocationExceptionRecord> list = query.getResultList();
+        for(RoomAllocationExceptionRecord r : list) {
+            r.getAffectedReservation().getGivenRooms().size();
+            r.getAffectedReservation().getRoomType();
+        }
+        return list;
     }
 
 }

@@ -4,15 +4,19 @@
  */
 package ejb.session.ws;
 
+import ejb.session.stateless.GuestSessionBeanLocal;
 import ejb.session.stateless.PartnerSessionBeanLocal;
 import ejb.session.stateless.ReservationSessionBeanLocal;
+import ejb.session.stateless.RoomAvailabilitySessionBeanLocal;
 import entity.Guest;
 import entity.Partner;
 import entity.Rate;
 import entity.Reservation;
 import entity.Room;
 import entity.RoomType;
+import java.time.LocalDate;
 import java.util.List;
+import javafx.util.Pair;
 import javax.ejb.EJB;
 import javax.jws.WebService;
 import javax.jws.WebMethod;
@@ -33,11 +37,20 @@ import util.exception.ReservationNotFoundException;
 @Stateless()
 public class PartnerWebService {
 
+    @EJB
+    private GuestSessionBeanLocal guestSessionBean;
+
+    @EJB
+    private RoomAvailabilitySessionBeanLocal roomAvailabilitySessionBean;
+
     @EJB(name = "ReservationSessionBeanLocal")
     private ReservationSessionBeanLocal reservationSessionBeanLocal;
 
     @EJB(name = "PartnerSessionBeanLocal")
     private PartnerSessionBeanLocal partnerSessionBeanLocal;
+    
+    
+    
 
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
@@ -47,6 +60,7 @@ public class PartnerWebService {
      *
      * @throws util.exception.PartnerNotFoundException
      */
+
     @WebMethod(operationName = "doLogin") //login
     public void doLogin(@WebParam(name = "username") String username, @WebParam(name = "password") String password)
             throws InvalidCredentialException {
@@ -105,5 +119,28 @@ public class PartnerWebService {
         g.setReservations(null);
 
         return r;
+    }
+
+    public List<Pair<RoomType, Integer>> getAvailableRoomTypeAndNumber(LocalDate checkInDate, LocalDate checkOutDate) {
+        List<Pair<RoomType, Integer>> listOfRoomTypesAndNumbers = roomAvailabilitySessionBean.getAvailableRoomTypeAndNumber(checkInDate, checkOutDate);
+        
+        
+        return null;
+    }
+
+    public Long createReservation(Reservation reservation, Long guestId) {
+        reservationSessionBeanLocal.createReservation(reservation, guestId);
+        
+        return null;
+    }
+    
+    public Long createGuestForPartner(Guest guest, Long partnerId) {
+        partnerSessionBeanLocal.createPartnerAccount(guest); // ADD PARTNERID INTO INPUT FOR ASSOCIATION
+        return null;
+    }
+    
+    public Guest getGuestByUsername(String username, String password) {
+        guestSessionBean.getGuestByUsername(username);
+        return null;
     }
 }

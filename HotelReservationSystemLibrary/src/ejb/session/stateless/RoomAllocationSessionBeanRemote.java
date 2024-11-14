@@ -5,8 +5,10 @@
 package ejb.session.stateless;
 
 import entity.Reservation;
+import entity.RoomAllocationExceptionRecord;
 import entity.RoomType;
 import java.time.LocalDate;
+import java.util.List;
 import javax.ejb.Remote;
 
 /**
@@ -15,7 +17,10 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface RoomAllocationSessionBeanRemote {
+
     public void allocateWalkInRoom(RoomType roomType, Reservation reservation);
-    
-        public void allocateDailyReservation(LocalDate currentDate);
+
+    public void allocateDailyReservation(LocalDate currentDate);
+
+    public List<RoomAllocationExceptionRecord> getRoomAllocationExceptionRecord(LocalDate date);
 }
