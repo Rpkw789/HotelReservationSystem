@@ -41,7 +41,7 @@ public class MainApp {
             System.out.println("**SOAP Holiday.com client**");
             System.out.println("Select to continue:");
             System.out.println("1. Login");
-            System.out.println("2. exit");
+            System.out.println("2. Exit");
 
             int response = sc.nextInt();
 
@@ -125,6 +125,7 @@ public class MainApp {
         String checkInDate = scanner.nextLine().trim();
         System.out.print("Enter Check-Out Date (YYYY-MM-DD) > ");
         String checkOutDate = scanner.nextLine().trim();
+        
 
         List<RoomType> roomTypes = service.getPartnerWebServicePort().getRoomTypes();
         System.out.println("Available Room Types and Quantity");
