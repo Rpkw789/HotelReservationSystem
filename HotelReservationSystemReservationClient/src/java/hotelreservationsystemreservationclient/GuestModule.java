@@ -64,6 +64,7 @@ public class GuestModule {
             } else if (response == 2) {
                 doViewReservationDetails();
             } else if (response == 3) {
+                System.out.println("");
                 System.out.println("**View all reservations**");
                 doViewAllReservations();
             } else if (response == 4) {
@@ -78,7 +79,7 @@ public class GuestModule {
 
     private void doSearch() {
         Scanner scanner = new Scanner(System.in);
-
+        System.out.println("");
         System.out.println("*Walk In Search & Reserve Room*");
         LocalDate startDate = null;
         String date = "";

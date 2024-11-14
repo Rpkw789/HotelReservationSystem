@@ -132,12 +132,12 @@ public class MainApp {
             }
         }
         
-        System.out.print("Please enter your email >");
+        System.out.print("Please enter your email > ");
         String email = scanner.nextLine().trim();
         
         String number;
         String phonePattern = "\\d+"; 
-        System.out.print("Please enter your phone number >");
+        System.out.print("Please enter your phone number > ");
         while (true){
             number=scanner.nextLine().trim();
             if (Pattern.matches(phonePattern, number)){
