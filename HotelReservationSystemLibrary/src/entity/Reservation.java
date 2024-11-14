@@ -88,7 +88,7 @@ public class Reservation implements Serializable {
     }
 
     public boolean overlaps(LocalDate currentDate) {
-        if ((this.checkInDate.isBefore(currentDate) || this.checkInDate.equals(currentDate)) || (this.checkOutDate.isAfter(currentDate) || this.checkOutDate.equals(currentDate))) {
+        if ((this.checkInDate.isBefore(currentDate) || this.checkInDate.equals(currentDate)) && (this.checkOutDate.isAfter(currentDate) || this.checkOutDate.equals(currentDate))) {
             return true;
         }
         return false;

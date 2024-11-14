@@ -38,13 +38,14 @@ public class RoomAllocationSessionBean implements RoomAllocationSessionBeanRemot
 
     }
 
+    @Override
     public void allocateDailyReservation(LocalDate currentDate) {
         Query query = em.createQuery("SELECT r FROM Reservation r");
         List<Reservation> allReservations = query.getResultList();
         List<Reservation> currentDayReservations = new ArrayList<Reservation>();
         allReservations.stream().filter(r -> r.getCheckInDate().equals(currentDate) && r.getGivenRooms().size() != r.getNumberOfRooms()).forEach(r -> currentDayReservations.add(r));
-        // r.getGivenRooms().size() == r.getNumberOfRooms()
-        System.out.println("RESERVATIONS: " + currentDayReservations); //////////////
+        // r.getGivenRooms().size() != r.getNumberOfRooms()
+
         Set<RoomType> involvedRoomTypes = new HashSet<RoomType>();
         for (Reservation reservation : currentDayReservations) {
             involvedRoomTypes.add(reservation.getRoomType());
@@ -66,7 +67,6 @@ public class RoomAllocationSessionBean implements RoomAllocationSessionBeanRemot
                 Reservation reservation = reservationsForThisRoomType.get(reservationCounter);
                 int numberOfRooms = reservation.getNumberOfRooms();
 
-                System.out.println("RESERVATION:" + reservation);
                 for (int i = reservation.getGivenRooms().size(); i < numberOfRooms; i++) { //int i = 0;
                     Room room = availableRooms.get(roomCounter);
 
@@ -81,7 +81,6 @@ public class RoomAllocationSessionBean implements RoomAllocationSessionBeanRemot
                 reservationCounter++;
             }
             
-            System.out.println("RESERVATION COUNTER: " + reservationCounter + ", ROOM COUNTER: " + roomCounter);
 
             // EXCEPTIONS
             List<RoomType> filteredRoomType = new ArrayList<RoomType>();
@@ -128,6 +127,7 @@ public class RoomAllocationSessionBean implements RoomAllocationSessionBeanRemot
         }
     }
     
+    @Override
     public List<RoomAllocationExceptionRecord> getRoomAllocationExceptionRecord(LocalDate date) {
         Query query = em.createQuery("SELECT r FROM RoomAllocationExceptionRecord r WHERE r.date = :date");
         query.setParameter("date", date);

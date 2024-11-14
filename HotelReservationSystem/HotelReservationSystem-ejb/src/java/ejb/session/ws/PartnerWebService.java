@@ -157,6 +157,7 @@ public class PartnerWebService {
         return reservationId;
     }
 
+
     @WebMethod(operationName="createGuestForPartner")
     public Long createGuestForPartner(Guest guest, Long partnerId) throws PartnerAccountExistsException {
         return partnerSessionBeanLocal.createPartnerAccount(guest, partnerId); 
@@ -179,5 +180,6 @@ public class PartnerWebService {
         }
         
         return ratesUse;
+
     }
 }

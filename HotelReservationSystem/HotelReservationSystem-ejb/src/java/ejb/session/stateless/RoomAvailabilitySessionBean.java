@@ -36,37 +36,43 @@ public class RoomAvailabilitySessionBean implements RoomAvailabilitySessionBeanR
     public List<Pair<RoomType, Integer>> getAvailableRoomTypeAndNumber(LocalDate checkInDate, LocalDate checkOutDate) {
         Query query = em.createQuery("SELECT rt FROM RoomType rt");
         List<RoomType> roomTypes = query.getResultList();
+
         List<Pair<RoomType, Integer>> result = new ArrayList<Pair<RoomType, Integer>>();
+
+        Query query1 = em.createQuery("SELECT r FROM Reservation r");
+        List<Reservation> allReservations = query1.getResultList();
 
         for (RoomType roomType : roomTypes) {
             List<Reservation> overlapReservations = new ArrayList<Reservation>();
-            List<Reservation> allReservations = roomType.getReservations();
             for (Reservation reservation : allReservations) {
                 if (reservation.overlaps(checkInDate, checkOutDate)) {
                     overlapReservations.add(reservation);
                 }
             }
 
-            int[] roomAvailability = new int[checkOutDate.compareTo(checkInDate) + 1];
+            int[] roomAvailability = new int[checkOutDate.compareTo(checkInDate)];
             for (Reservation reservation : overlapReservations) {
                 LocalDate overlapStart = reservation.getCheckInDate().isBefore(checkInDate) ? checkInDate : reservation.getCheckInDate();
-                LocalDate overlapEnd = reservation.getCheckOutDate().isAfter(checkOutDate) ? checkOutDate : reservation.getCheckOutDate().minusDays(1);
+                LocalDate overlapEnd = reservation.getCheckOutDate().isAfter(checkOutDate) ? checkOutDate.minusDays(1) : reservation.getCheckOutDate().minusDays(1);
 
-                if (reservation.isCheckedIn()) {
+                if (!reservation.getGivenRooms().isEmpty()) {
                     for (LocalDate date = overlapStart; !date.isAfter(overlapEnd); date = date.plusDays(1)) {
                         int index = date.compareTo(checkInDate);
-                        
-                        for(Room room : reservation.getGivenRooms()) {
-                            if(room.getRoomType().equals(roomType)) {
+
+                        for (Room room : reservation.getGivenRooms()) {
+                            if (room.getRoomType().equals(roomType)) {
+                                System.out.println("HERE");
                                 roomAvailability[index] += 1;
                             }
                         }
-                        
                     }
                 } else {
-                    for (LocalDate date = overlapStart; !date.isAfter(overlapEnd); date = date.plusDays(1)) {
-                        int index = date.compareTo(checkInDate);
-                        roomAvailability[index] += reservation.getNumberOfRooms();
+                    if (reservation.getRoomType().equals(roomType)) {
+                        for (LocalDate date = overlapStart; !date.isAfter(overlapEnd); date = date.plusDays(1)) {
+                            int index = date.compareTo(checkInDate);
+                            System.out.println("THERE");
+                            roomAvailability[index] += reservation.getNumberOfRooms();
+                        }
                     }
                 }
 
@@ -111,9 +117,12 @@ public class RoomAvailabilitySessionBean implements RoomAvailabilitySessionBeanR
             }
 
             currentRates.sort(null);
-            usedRates.add(currentRates.get(currentRates.size() - 1));
+            usedRates.add(currentRates.get(0));
+            
+            System.out.println("DATE: " + date + " == " + currentRates);
         }
 
+        System.out.println("USEDRATES:" + usedRates.toString());
         return usedRates;
     }
 
