@@ -119,10 +119,10 @@ public class RoomAvailabilitySessionBean implements RoomAvailabilitySessionBeanR
             currentRates.sort(null);
             usedRates.add(currentRates.get(0));
             
-            System.out.println("DATE: " + date + " == " + currentRates);
+            //System.out.println("DATE: " + date + " == " + currentRates);
         }
 
-        System.out.println("USEDRATES:" + usedRates.toString());
+        //System.out.println("USEDRATES:" + usedRates.toString());
         return usedRates;
     }
 

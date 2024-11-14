@@ -14,6 +14,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Email;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -59,6 +61,9 @@ public class Guest implements Serializable {
     // Relationships
     @OneToMany(mappedBy = "guest")
     private List<Reservation> reservations = new ArrayList<Reservation>();
+    @ManyToOne(optional = true)
+    @JoinColumn(nullable = true)
+    private Partner partner;
 
     public Guest() {
     }
@@ -202,6 +207,20 @@ public class Guest implements Serializable {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * @return the partner
+     */
+    public Partner getPartner() {
+        return partner;
+    }
+
+    /**
+     * @param partner the partner to set
+     */
+    public void setPartner(Partner partner) {
+        this.partner = partner;
     }
 
 }
