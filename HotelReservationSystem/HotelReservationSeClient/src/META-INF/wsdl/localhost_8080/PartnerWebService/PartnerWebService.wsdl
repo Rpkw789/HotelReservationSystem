@@ -4,53 +4,38 @@
 <xsd:import namespace="http://ws.session.ejb/" schemaLocation="http://localhost:8080/PartnerWebService/PartnerWebService?xsd=1"/>
 </xsd:schema>
 </types>
-<message name="getCheckOutDate">
-<part name="parameters" element="tns:getCheckOutDate"/>
-</message>
-<message name="getCheckOutDateResponse">
-<part name="parameters" element="tns:getCheckOutDateResponse"/>
-</message>
-<message name="ReservationNotFoundException">
-<part name="fault" element="tns:ReservationNotFoundException"/>
-</message>
 <message name="getCheckInDate">
 <part name="parameters" element="tns:getCheckInDate"/>
 </message>
 <message name="getCheckInDateResponse">
 <part name="parameters" element="tns:getCheckInDateResponse"/>
 </message>
-<message name="getReservationById">
-<part name="parameters" element="tns:getReservationById"/>
+<message name="ReservationNotFoundException">
+<part name="fault" element="tns:ReservationNotFoundException"/>
 </message>
-<message name="getReservationByIdResponse">
-<part name="parameters" element="tns:getReservationByIdResponse"/>
+<message name="getCheckOutDate">
+<part name="parameters" element="tns:getCheckOutDate"/>
 </message>
-<message name="createReservation">
-<part name="parameters" element="tns:createReservation"/>
-</message>
-<message name="createReservationResponse">
-<part name="parameters" element="tns:createReservationResponse"/>
-</message>
-<message name="logInPartnerAccount">
-<part name="parameters" element="tns:logInPartnerAccount"/>
-</message>
-<message name="logInPartnerAccountResponse">
-<part name="parameters" element="tns:logInPartnerAccountResponse"/>
-</message>
-<message name="InvalidCredentialException">
-<part name="fault" element="tns:InvalidCredentialException"/>
-</message>
-<message name="retrieveAllReservations">
-<part name="parameters" element="tns:retrieveAllReservations"/>
-</message>
-<message name="retrieveAllReservationsResponse">
-<part name="parameters" element="tns:retrieveAllReservationsResponse"/>
+<message name="getCheckOutDateResponse">
+<part name="parameters" element="tns:getCheckOutDateResponse"/>
 </message>
 <message name="getReservationByGuest">
 <part name="parameters" element="tns:getReservationByGuest"/>
 </message>
 <message name="getReservationByGuestResponse">
 <part name="parameters" element="tns:getReservationByGuestResponse"/>
+</message>
+<message name="getRoomTypes">
+<part name="parameters" element="tns:getRoomTypes"/>
+</message>
+<message name="getRoomTypesResponse">
+<part name="parameters" element="tns:getRoomTypesResponse"/>
+</message>
+<message name="getAvailableNumber">
+<part name="parameters" element="tns:getAvailableNumber"/>
+</message>
+<message name="getAvailableNumberResponse">
+<part name="parameters" element="tns:getAvailableNumberResponse"/>
 </message>
 <message name="createGuestForPartner">
 <part name="parameters" element="tns:createGuestForPartner"/>
@@ -61,11 +46,38 @@
 <message name="PartnerAccountExistsException">
 <part name="fault" element="tns:PartnerAccountExistsException"/>
 </message>
-<message name="getAvailableNumber">
-<part name="parameters" element="tns:getAvailableNumber"/>
+<message name="getRatesUsed">
+<part name="parameters" element="tns:getRatesUsed"/>
 </message>
-<message name="getAvailableNumberResponse">
-<part name="parameters" element="tns:getAvailableNumberResponse"/>
+<message name="getRatesUsedResponse">
+<part name="parameters" element="tns:getRatesUsedResponse"/>
+</message>
+<message name="createReservation">
+<part name="parameters" element="tns:createReservation"/>
+</message>
+<message name="createReservationResponse">
+<part name="parameters" element="tns:createReservationResponse"/>
+</message>
+<message name="getReservationById">
+<part name="parameters" element="tns:getReservationById"/>
+</message>
+<message name="getReservationByIdResponse">
+<part name="parameters" element="tns:getReservationByIdResponse"/>
+</message>
+<message name="retrieveAllReservations">
+<part name="parameters" element="tns:retrieveAllReservations"/>
+</message>
+<message name="retrieveAllReservationsResponse">
+<part name="parameters" element="tns:retrieveAllReservationsResponse"/>
+</message>
+<message name="logInPartnerAccount">
+<part name="parameters" element="tns:logInPartnerAccount"/>
+</message>
+<message name="logInPartnerAccountResponse">
+<part name="parameters" element="tns:logInPartnerAccountResponse"/>
+</message>
+<message name="InvalidCredentialException">
+<part name="fault" element="tns:InvalidCredentialException"/>
 </message>
 <message name="doLogin">
 <part name="parameters" element="tns:doLogin"/>
@@ -73,89 +85,65 @@
 <message name="doLoginResponse">
 <part name="parameters" element="tns:doLoginResponse"/>
 </message>
-<message name="getRoomTypes">
-<part name="parameters" element="tns:getRoomTypes"/>
-</message>
-<message name="getRoomTypesResponse">
-<part name="parameters" element="tns:getRoomTypesResponse"/>
-</message>
-<message name="getRatesUsed">
-<part name="parameters" element="tns:getRatesUsed"/>
-</message>
-<message name="getRatesUsedResponse">
-<part name="parameters" element="tns:getRatesUsedResponse"/>
-</message>
 <portType name="PartnerWebService">
-<operation name="getCheckOutDate">
-<input wsam:Action="http://ws.session.ejb/PartnerWebService/getCheckOutDateRequest" message="tns:getCheckOutDate"/>
-<output wsam:Action="http://ws.session.ejb/PartnerWebService/getCheckOutDateResponse" message="tns:getCheckOutDateResponse"/>
-<fault message="tns:ReservationNotFoundException" name="ReservationNotFoundException" wsam:Action="http://ws.session.ejb/PartnerWebService/getCheckOutDate/Fault/ReservationNotFoundException"/>
-</operation>
 <operation name="getCheckInDate">
 <input wsam:Action="http://ws.session.ejb/PartnerWebService/getCheckInDateRequest" message="tns:getCheckInDate"/>
 <output wsam:Action="http://ws.session.ejb/PartnerWebService/getCheckInDateResponse" message="tns:getCheckInDateResponse"/>
 <fault message="tns:ReservationNotFoundException" name="ReservationNotFoundException" wsam:Action="http://ws.session.ejb/PartnerWebService/getCheckInDate/Fault/ReservationNotFoundException"/>
 </operation>
-<operation name="getReservationById">
-<input wsam:Action="http://ws.session.ejb/PartnerWebService/getReservationByIdRequest" message="tns:getReservationById"/>
-<output wsam:Action="http://ws.session.ejb/PartnerWebService/getReservationByIdResponse" message="tns:getReservationByIdResponse"/>
-<fault message="tns:ReservationNotFoundException" name="ReservationNotFoundException" wsam:Action="http://ws.session.ejb/PartnerWebService/getReservationById/Fault/ReservationNotFoundException"/>
-</operation>
-<operation name="createReservation">
-<input wsam:Action="http://ws.session.ejb/PartnerWebService/createReservationRequest" message="tns:createReservation"/>
-<output wsam:Action="http://ws.session.ejb/PartnerWebService/createReservationResponse" message="tns:createReservationResponse"/>
-</operation>
-<operation name="logInPartnerAccount">
-<input wsam:Action="http://ws.session.ejb/PartnerWebService/logInPartnerAccountRequest" message="tns:logInPartnerAccount"/>
-<output wsam:Action="http://ws.session.ejb/PartnerWebService/logInPartnerAccountResponse" message="tns:logInPartnerAccountResponse"/>
-<fault message="tns:InvalidCredentialException" name="InvalidCredentialException" wsam:Action="http://ws.session.ejb/PartnerWebService/logInPartnerAccount/Fault/InvalidCredentialException"/>
-</operation>
-<operation name="retrieveAllReservations">
-<input wsam:Action="http://ws.session.ejb/PartnerWebService/retrieveAllReservationsRequest" message="tns:retrieveAllReservations"/>
-<output wsam:Action="http://ws.session.ejb/PartnerWebService/retrieveAllReservationsResponse" message="tns:retrieveAllReservationsResponse"/>
+<operation name="getCheckOutDate">
+<input wsam:Action="http://ws.session.ejb/PartnerWebService/getCheckOutDateRequest" message="tns:getCheckOutDate"/>
+<output wsam:Action="http://ws.session.ejb/PartnerWebService/getCheckOutDateResponse" message="tns:getCheckOutDateResponse"/>
+<fault message="tns:ReservationNotFoundException" name="ReservationNotFoundException" wsam:Action="http://ws.session.ejb/PartnerWebService/getCheckOutDate/Fault/ReservationNotFoundException"/>
 </operation>
 <operation name="getReservationByGuest">
 <input wsam:Action="http://ws.session.ejb/PartnerWebService/getReservationByGuestRequest" message="tns:getReservationByGuest"/>
 <output wsam:Action="http://ws.session.ejb/PartnerWebService/getReservationByGuestResponse" message="tns:getReservationByGuestResponse"/>
 <fault message="tns:ReservationNotFoundException" name="ReservationNotFoundException" wsam:Action="http://ws.session.ejb/PartnerWebService/getReservationByGuest/Fault/ReservationNotFoundException"/>
 </operation>
+<operation name="getRoomTypes">
+<input wsam:Action="http://ws.session.ejb/PartnerWebService/getRoomTypesRequest" message="tns:getRoomTypes"/>
+<output wsam:Action="http://ws.session.ejb/PartnerWebService/getRoomTypesResponse" message="tns:getRoomTypesResponse"/>
+</operation>
+<operation name="getAvailableNumber">
+<input wsam:Action="http://ws.session.ejb/PartnerWebService/getAvailableNumberRequest" message="tns:getAvailableNumber"/>
+<output wsam:Action="http://ws.session.ejb/PartnerWebService/getAvailableNumberResponse" message="tns:getAvailableNumberResponse"/>
+</operation>
 <operation name="createGuestForPartner">
 <input wsam:Action="http://ws.session.ejb/PartnerWebService/createGuestForPartnerRequest" message="tns:createGuestForPartner"/>
 <output wsam:Action="http://ws.session.ejb/PartnerWebService/createGuestForPartnerResponse" message="tns:createGuestForPartnerResponse"/>
 <fault message="tns:PartnerAccountExistsException" name="PartnerAccountExistsException" wsam:Action="http://ws.session.ejb/PartnerWebService/createGuestForPartner/Fault/PartnerAccountExistsException"/>
 </operation>
-<operation name="getAvailableNumber">
-<input wsam:Action="http://ws.session.ejb/PartnerWebService/getAvailableNumberRequest" message="tns:getAvailableNumber"/>
-<output wsam:Action="http://ws.session.ejb/PartnerWebService/getAvailableNumberResponse" message="tns:getAvailableNumberResponse"/>
+<operation name="getRatesUsed">
+<input wsam:Action="http://ws.session.ejb/PartnerWebService/getRatesUsedRequest" message="tns:getRatesUsed"/>
+<output wsam:Action="http://ws.session.ejb/PartnerWebService/getRatesUsedResponse" message="tns:getRatesUsedResponse"/>
+</operation>
+<operation name="createReservation">
+<input wsam:Action="http://ws.session.ejb/PartnerWebService/createReservationRequest" message="tns:createReservation"/>
+<output wsam:Action="http://ws.session.ejb/PartnerWebService/createReservationResponse" message="tns:createReservationResponse"/>
+</operation>
+<operation name="getReservationById">
+<input wsam:Action="http://ws.session.ejb/PartnerWebService/getReservationByIdRequest" message="tns:getReservationById"/>
+<output wsam:Action="http://ws.session.ejb/PartnerWebService/getReservationByIdResponse" message="tns:getReservationByIdResponse"/>
+<fault message="tns:ReservationNotFoundException" name="ReservationNotFoundException" wsam:Action="http://ws.session.ejb/PartnerWebService/getReservationById/Fault/ReservationNotFoundException"/>
+</operation>
+<operation name="retrieveAllReservations">
+<input wsam:Action="http://ws.session.ejb/PartnerWebService/retrieveAllReservationsRequest" message="tns:retrieveAllReservations"/>
+<output wsam:Action="http://ws.session.ejb/PartnerWebService/retrieveAllReservationsResponse" message="tns:retrieveAllReservationsResponse"/>
+</operation>
+<operation name="logInPartnerAccount">
+<input wsam:Action="http://ws.session.ejb/PartnerWebService/logInPartnerAccountRequest" message="tns:logInPartnerAccount"/>
+<output wsam:Action="http://ws.session.ejb/PartnerWebService/logInPartnerAccountResponse" message="tns:logInPartnerAccountResponse"/>
+<fault message="tns:InvalidCredentialException" name="InvalidCredentialException" wsam:Action="http://ws.session.ejb/PartnerWebService/logInPartnerAccount/Fault/InvalidCredentialException"/>
 </operation>
 <operation name="doLogin">
 <input wsam:Action="http://ws.session.ejb/PartnerWebService/doLoginRequest" message="tns:doLogin"/>
 <output wsam:Action="http://ws.session.ejb/PartnerWebService/doLoginResponse" message="tns:doLoginResponse"/>
 <fault message="tns:InvalidCredentialException" name="InvalidCredentialException" wsam:Action="http://ws.session.ejb/PartnerWebService/doLogin/Fault/InvalidCredentialException"/>
 </operation>
-<operation name="getRoomTypes">
-<input wsam:Action="http://ws.session.ejb/PartnerWebService/getRoomTypesRequest" message="tns:getRoomTypes"/>
-<output wsam:Action="http://ws.session.ejb/PartnerWebService/getRoomTypesResponse" message="tns:getRoomTypesResponse"/>
-</operation>
-<operation name="getRatesUsed">
-<input wsam:Action="http://ws.session.ejb/PartnerWebService/getRatesUsedRequest" message="tns:getRatesUsed"/>
-<output wsam:Action="http://ws.session.ejb/PartnerWebService/getRatesUsedResponse" message="tns:getRatesUsedResponse"/>
-</operation>
 </portType>
 <binding name="PartnerWebServicePortBinding" type="tns:PartnerWebService">
 <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-<operation name="getCheckOutDate">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="ReservationNotFoundException">
-<soap:fault name="ReservationNotFoundException" use="literal"/>
-</fault>
-</operation>
 <operation name="getCheckInDate">
 <soap:operation soapAction=""/>
 <input>
@@ -168,7 +156,7 @@
 <soap:fault name="ReservationNotFoundException" use="literal"/>
 </fault>
 </operation>
-<operation name="getReservationById">
+<operation name="getCheckOutDate">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -179,36 +167,6 @@
 <fault name="ReservationNotFoundException">
 <soap:fault name="ReservationNotFoundException" use="literal"/>
 </fault>
-</operation>
-<operation name="createReservation">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-</operation>
-<operation name="logInPartnerAccount">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="InvalidCredentialException">
-<soap:fault name="InvalidCredentialException" use="literal"/>
-</fault>
-</operation>
-<operation name="retrieveAllReservations">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
 </operation>
 <operation name="getReservationByGuest">
 <soap:operation soapAction=""/>
@@ -221,6 +179,24 @@
 <fault name="ReservationNotFoundException">
 <soap:fault name="ReservationNotFoundException" use="literal"/>
 </fault>
+</operation>
+<operation name="getRoomTypes">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="getAvailableNumber">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
 </operation>
 <operation name="createGuestForPartner">
 <soap:operation soapAction=""/>
@@ -234,7 +210,7 @@
 <soap:fault name="PartnerAccountExistsException" use="literal"/>
 </fault>
 </operation>
-<operation name="getAvailableNumber">
+<operation name="getRatesUsed">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -242,6 +218,48 @@
 <output>
 <soap:body use="literal"/>
 </output>
+</operation>
+<operation name="createReservation">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="getReservationById">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="ReservationNotFoundException">
+<soap:fault name="ReservationNotFoundException" use="literal"/>
+</fault>
+</operation>
+<operation name="retrieveAllReservations">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="logInPartnerAccount">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="InvalidCredentialException">
+<soap:fault name="InvalidCredentialException" use="literal"/>
+</fault>
 </operation>
 <operation name="doLogin">
 <soap:operation soapAction=""/>
@@ -254,24 +272,6 @@
 <fault name="InvalidCredentialException">
 <soap:fault name="InvalidCredentialException" use="literal"/>
 </fault>
-</operation>
-<operation name="getRoomTypes">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-</operation>
-<operation name="getRatesUsed">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
 </operation>
 </binding>
 <service name="PartnerWebService">
