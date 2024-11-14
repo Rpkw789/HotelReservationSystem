@@ -9,6 +9,7 @@ import entity.Partner;
 import entity.Reservation;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -16,6 +17,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import util.exception.GuestNotFoundException;
+import util.exception.InvalidCredentialException;
 import util.exception.PartnerAccountExistsException;
 import util.exception.PartnerExistsException;
 import util.exception.PartnerNotFoundException;
@@ -27,8 +29,13 @@ import util.exception.PartnerNotFoundException;
 @Stateless
 public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSessionBeanLocal {
 
+    @EJB
+    private GuestSessionBeanLocal guestSessionBean;
+
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
+    
+    
 
     @Override
     public Long createNewPartner(Partner newPartner) throws PartnerExistsException{
@@ -59,10 +66,23 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
         if (isUniqueGuestUsername(g.getUsername())){
             em.persist(g);
             em.flush();
+            
             return g;
         } else {
             throw new PartnerAccountExistsException("Account with same username already exists!");     
         }
+    }
+    
+    @Override
+    public void logInPartnerAccount(String username, String password) throws InvalidCredentialException{
+       try {
+           Guest g = guestSessionBean.getGuestByUsername(username);
+           if (!g.getPassword().equals(password)) {
+               throw new InvalidCredentialException("Password is not correct!");
+           }
+       } catch (GuestNotFoundException ex) {
+           ex.getMessage();
+       }
     }
     
     @Override

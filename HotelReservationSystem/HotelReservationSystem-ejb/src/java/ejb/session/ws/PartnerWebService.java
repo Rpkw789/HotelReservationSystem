@@ -20,6 +20,7 @@ import javax.jws.WebParam;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import util.exception.InvalidCredentialException;
 import util.exception.PartnerExistsException;
 import util.exception.PartnerNotFoundException;
 import util.exception.ReservationNotFoundException;
@@ -41,29 +42,35 @@ public class PartnerWebService {
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
 
-    
     /**
      * This is a sample web service operation
+     *
+     * @throws util.exception.PartnerNotFoundException
      */
+    @WebMethod(operationName = "doLogin") //login
+    public void doLogin(@WebParam(name = "username") String username, @WebParam(name = "password") String password)
+            throws InvalidCredentialException {
 
-    @WebMethod(operationName = "getPartnerByUsername") //login
-    public Partner getPartnerByUsername(@WebParam(name = "username") String username) throws PartnerNotFoundException{
-        Partner p =partnerSessionBeanLocal.getPartnerByUsername(username);
-        em.detach(p);
-        List<Guest> guests = p.getGuests();
-        for (Guest g :guests){
-            em.detach(g);
-            g.setReservations(null);
-            
+        try {
+            Partner p = partnerSessionBeanLocal.getPartnerByUsername(username);
+            if (!p.getPassword().equals(password)) {
+                throw new InvalidCredentialException("Password is wrong");
+            }
+            em.detach(p);
+            List<Guest> guests = p.getGuests();
+            for (Guest g : guests) {
+                em.detach(g);
+                g.setReservations(null);
+            }
+        }catch (PartnerNotFoundException ex) {
+             System.out.println("Account does not exist");
         }
-        return p;
     }
-    
-    
+
     @WebMethod(operationName = "retrieveAllReservations") //retrieve all reservation tied to partner
-    public List<Reservation> retrieveAllReservations(@WebParam(name = "partner") Partner partner){
+    public List<Reservation> retrieveAllReservations(@WebParam(name = "partner") Partner partner) {
         List<Reservation> reservations = partnerSessionBeanLocal.retrieveAllReservations(partner);
-        
+
         for (Reservation r : reservations) {
             em.detach(r);
             r.setGivenRooms(null);
@@ -73,30 +80,30 @@ public class PartnerWebService {
         }
         return reservations;
     }
-    
+
     @WebMethod(operationName = "getReservationById") //retrieve particular reservation from the id
     public Reservation getReservationById(@WebParam(name = "reservationId") Long reservationId) throws ReservationNotFoundException {
         Reservation r = reservationSessionBeanLocal.getReservationById(reservationId);
-        
+
         em.detach(r);
         r.setGivenRooms(null);
-        
+
         List<Rate> rates = r.getRates();
         for (Rate rate : rates) {
             em.detach(rate);
             rate.setRoomType(null);
         }
-        
+
         RoomType rt = r.getRoomType();
         em.detach(rt);
         rt.setReservations(null);
         rt.setRooms(null);
         ///TODO: rt.setHigherRoomType(null);
-        
+
         Guest g = r.getGuest();
         em.detach(g);
         g.setReservations(null);
-        
+
         return r;
     }
 }
