@@ -10,6 +10,7 @@ import entity.Reservation;
 import java.util.List;
 import javax.ejb.Remote;
 import util.exception.GuestNotFoundException;
+import util.exception.InvalidCredentialException;
 import util.exception.PartnerAccountExistsException;
 import util.exception.PartnerExistsException;
 import util.exception.PartnerNotFoundException;
@@ -32,4 +33,5 @@ public interface PartnerSessionBeanRemote {
     public boolean isUniqueGuestUsername(String username);
     public Guest getPartnerAccountByUsername(String username) throws GuestNotFoundException;
     public List<Reservation> retrieveAllReservations(Partner p);
+    public void logInPartnerAccount(String username, String password) throws InvalidCredentialException;
 }

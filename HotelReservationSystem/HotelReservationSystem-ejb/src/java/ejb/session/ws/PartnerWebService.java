@@ -24,6 +24,7 @@ import javax.jws.WebParam;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import util.exception.InvalidCredentialException;
 import util.exception.PartnerExistsException;
 import util.exception.PartnerNotFoundException;
 import util.exception.ReservationNotFoundException;
@@ -56,18 +57,28 @@ public class PartnerWebService {
 
     /**
      * This is a sample web service operation
+     *
+     * @throws util.exception.PartnerNotFoundException
      */
-    @WebMethod(operationName = "getPartnerByUsername") //login
-    public Partner getPartnerByUsername(@WebParam(name = "username") String username) throws PartnerNotFoundException {
-        Partner p = partnerSessionBeanLocal.getPartnerByUsername(username);
-        em.detach(p);
-        List<Guest> guests = p.getGuests();
-        for (Guest g : guests) {
-            em.detach(g);
-            g.setReservations(null);
 
+    @WebMethod(operationName = "doLogin") //login
+    public void doLogin(@WebParam(name = "username") String username, @WebParam(name = "password") String password)
+            throws InvalidCredentialException {
+
+        try {
+            Partner p = partnerSessionBeanLocal.getPartnerByUsername(username);
+            if (!p.getPassword().equals(password)) {
+                throw new InvalidCredentialException("Password is wrong");
+            }
+            em.detach(p);
+            List<Guest> guests = p.getGuests();
+            for (Guest g : guests) {
+                em.detach(g);
+                g.setReservations(null);
+            }
+        }catch (PartnerNotFoundException ex) {
+             System.out.println("Account does not exist");
         }
-        return p;
     }
 
     @WebMethod(operationName = "retrieveAllReservations") //retrieve all reservation tied to partner
