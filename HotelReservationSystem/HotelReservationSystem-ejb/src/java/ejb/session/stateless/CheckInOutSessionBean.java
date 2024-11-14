@@ -4,9 +4,12 @@
  */
 package ejb.session.stateless;
 
+import entity.Rate;
 import entity.Reservation;
+import entity.Room;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import util.enumeration.RoomAvailabilityStatusEnum;
 import util.exception.CheckInException;
 import util.exception.CheckOutException;
 import util.exception.ReservationNotFoundException;
@@ -28,6 +31,9 @@ public class CheckInOutSessionBean implements CheckInOutSessionBeanRemote, Check
                 throw new CheckInException("Reservation has been checked in");
             }
             reservation.setCheckedIn(true);
+            for(Room room : reservation.getGivenRooms()) {
+                room.setAvailabilityStatus(RoomAvailabilityStatusEnum.NOT_AVAILABLE);
+            }
         } catch (ReservationNotFoundException ex) {
             throw new CheckInException(ex.getMessage());
         }
@@ -39,7 +45,14 @@ public class CheckInOutSessionBean implements CheckInOutSessionBeanRemote, Check
             if (!reservation.isCheckedIn()) {
                 throw new CheckOutException("Reservation has been checked out");
             }
-            reservation.setCheckedIn(false);
+            for(Room room : reservation.getGivenRooms()) {
+                room.setReservation(null);
+                room.setAvailabilityStatus(RoomAvailabilityStatusEnum.AVAILABLE);
+            }
+            for(Rate rate : reservation.getRates()) {
+                rate.getReservations().remove(reservation);
+            }
+            reservation.getGuest().getReservations().remove(reservation);
         } catch (ReservationNotFoundException ex) {
             throw new CheckOutException(ex.getMessage());
         }

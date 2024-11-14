@@ -18,6 +18,7 @@ import entity.Guest;
 import entity.Rate;
 import entity.Reservation;
 import entity.Room;
+import entity.RoomAllocationExceptionRecord;
 import entity.RoomType;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -29,6 +30,8 @@ import util.enumeration.EmployeeRoleEnum;
 import util.enumeration.RateTypeEnum;
 import util.enumeration.RoomAvailabilityStatusEnum;
 import util.enumeration.OperationalStatusEnum;
+import util.exception.CheckInException;
+import util.exception.CheckOutException;
 import util.exception.GuestNotFoundException;
 import util.exception.RateExistsException;
 import util.exception.RateNotFoundException;
@@ -256,7 +259,7 @@ public class HotelOperationModule {
             roomType.setNextHigherRoomType(nextHigherRoomType);
             break;
         }
-        
+
         System.out.println("Type 'q' if you have no more amenities");
         List<String> amenities = roomType.getAmenities();
         while (true) {
@@ -462,8 +465,8 @@ public class HotelOperationModule {
 
             RoomType roomType = roomTypes.get(response - 1);
             System.out.println("RoomType - " + roomType.getRoomTypeId());
-            if(roomType.getNextHigherRoomType() != null) {
-               System.out.println("Next Higher Room Type: " + roomType.getNextHigherRoomType().getName()); 
+            if (roomType.getNextHigherRoomType() != null) {
+                System.out.println("Next Higher Room Type: " + roomType.getNextHigherRoomType().getName());
             }
             System.out.println("Name: " + roomType.getName());
             System.out.println("Description: " + roomType.getDescription());
@@ -673,7 +676,17 @@ public class HotelOperationModule {
     }
 
     private void doViewRoomAllocationExceptionReport() {
-        System.out.println("doViewRoomAllocationExceptionReport");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*View Room Allocation Exception Report*");
+        System.out.print("Enter Date > ");
+        LocalDate date = LocalDate.parse(scanner.nextLine().trim());
+        
+        List<RoomAllocationExceptionRecord> records = roomAllocationSessionBean.getRoomAllocationExceptionRecord(date);
+        for(RoomAllocationExceptionRecord record : records) {
+            System.out.println("Record " + record.getRoomAllocationExceptionId());
+            System.out.println("    Reservation Id: " + record.getAffectedReservation().getReservationId());
+            System.out.println("    Description: " + record.getDescription());
+        }
     }
 
     ///////////SALES OPERATION//////////////////////
@@ -1063,11 +1076,88 @@ public class HotelOperationModule {
     }
 
     private void doCheckInGuest() {
-        System.out.println("doCheckInGuest");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*Check In Guest*");
+        System.out.print("Guest's Passport Number > ");
+        String passportNumber = scanner.nextLine().trim();
+
+        try {
+            Guest guest = guestSessionBean.getGuestByPassportNumber(passportNumber);
+            LocalDate currentDate = LocalDate.now();
+
+            List<Reservation> reservations = guest.getReservations();
+            List<Reservation> currentDayReservations = new ArrayList<Reservation>();
+            reservations.stream().filter(r -> r.overlaps(currentDate)).forEach(r -> currentDayReservations.add(r));
+
+            for (int i = 0; i < currentDayReservations.size(); i++) {
+                Reservation reservation = currentDayReservations.get(i);
+                System.out.println((i + 1) + ": Reservation Id: " + reservation.getReservationId() + " , Checked In: " + reservation.isCheckedIn() + " , Number Of Rooms: " + reservation.getNumberOfRooms() + " , Period of Stay: " + reservation.getCheckInDate() + " to " + reservation.getCheckOutDate());
+            }
+            int exit = currentDayReservations.size() + 1;
+            System.out.println(exit + ": Exit");
+
+            int response = scanner.nextInt();
+            scanner.nextLine();
+
+            if (response == exit) {
+                return;
+            }
+
+            Reservation reservation = currentDayReservations.get(response - 1);
+            try {
+                checkInOutSessionBean.checkIn(reservation.getReservationId());
+                System.out.println("Rooms Allocated:");
+                List<Room> rooms = reservation.getGivenRooms();
+                
+                for(Room room : rooms) {
+                    System.out.println("    " + room.getRoomNumber());
+                }
+            } catch (CheckInException ex) {
+                System.out.println("Error: " + ex.getMessage());
+            }
+        } catch (GuestNotFoundException ex) {
+            System.out.println("Error: " + ex.getMessage());
+        }
+
     }
 
     private void doCheckOutGuest() {
-        System.out.println("doCheckOutGuest");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*Check Out Guest*");
+        System.out.print("Guest's Passport Number > ");
+        String passportNumber = scanner.nextLine().trim();
+
+        try {
+            Guest guest = guestSessionBean.getGuestByPassportNumber(passportNumber);
+
+            List<Reservation> reservations = guest.getReservations();
+            List<Reservation> checkedInReservations = new ArrayList<Reservation>();
+            reservations.stream().filter(r -> r.isCheckedIn()).forEach(r -> checkedInReservations.add(r));
+
+            for (int i = 0; i < checkedInReservations.size(); i++) {
+                Reservation reservation = checkedInReservations.get(i);
+                System.out.println((i + 1) + ": Reservation Id: " + reservation.getReservationId() + " , Checked In: " + reservation.isCheckedIn() + " , Number Of Rooms: " + reservation.getNumberOfRooms() + " , Period of Stay: " + reservation.getCheckInDate() + " to " + reservation.getCheckOutDate());
+            }
+            int exit = checkedInReservations.size() + 1;
+            System.out.println(exit + ": Exit");
+
+            int response = scanner.nextInt();
+            scanner.nextLine();
+
+            if (response == exit) {
+                return;
+            }
+
+            Reservation reservation = checkedInReservations.get(response - 1);
+            try {
+                checkInOutSessionBean.checkOut(reservation.getReservationId());
+                System.out.println("Guest has checked Out");
+            } catch (CheckOutException ex) {
+                System.out.println("Error: " + ex.getMessage());
+            }
+        } catch (GuestNotFoundException ex) {
+            System.out.println("Error: " + ex.getMessage());
+        }
     }
 
     ///////////ALLOCATE ROOM TO CURRENT DAY RESERVATION/////////////

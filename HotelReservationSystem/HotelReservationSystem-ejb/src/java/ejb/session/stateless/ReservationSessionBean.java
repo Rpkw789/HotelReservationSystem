@@ -72,5 +72,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         }
         return reservation;
     }
+    
 
 }
