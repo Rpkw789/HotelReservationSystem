@@ -66,7 +66,7 @@ public class MainApp {
             Scanner scanner = new Scanner(System.in);
 
             System.out.println();
-            System.out.println("***Welcome To Hotel Reservation System - Reservation Client***");
+            System.out.println("***Welcome To Hotel Reservation System - Management Client***");
             System.out.println("1: Log-in");
             System.out.println("2: Exit");
 

@@ -785,7 +785,7 @@ public class HotelOperationModule {
 
         try {
             Long rateId = rateSessionBean.createNewRate(rate);
-            System.out.println("Rate created with Room Type ID: " + rateId);
+            System.out.println("Rate created with Rate Type ID: " + rateId);
         } catch (RateExistsException ex) {
             System.out.println("Error: " + ex.getMessage());
         }
@@ -852,25 +852,39 @@ public class HotelOperationModule {
                         rate.setRatePerNight(scanner.nextDouble());
                         scanner.nextLine();
                     } else if (response == 5 && (rate.getRateType().equals(RateTypeEnum.PEAK) || rate.getRateType().equals(RateTypeEnum.PROMOTION))) {
-                        while (true) {
+                        LocalDate start = null;
+                        while (start==null|| !start.isBefore(rate.getValidityEnd())) {
                             System.out.print("Start Period (YYYY-MM-DD) > ");
                             String startDate = scanner.nextLine().trim();
                             try {
-                                LocalDate localDate = LocalDate.parse(startDate);
-                                rate.setValidityStart(localDate);
-                                break;
+                                start = LocalDate.parse(startDate);
+                                if (!start.isBefore(rate.getValidityEnd())){
+                                    System.out.println("Error: Start date must be before end date");
+                                    start=null;
+                                } else {
+                                    rate.setValidityStart(start);
+                                    break;
+                                }
+                                
                             } catch (DateTimeParseException ex) {
                                 System.out.println("Error: Invalid Date");
                             }
                         }
                     } else if (response == 6 && (rate.getRateType().equals(RateTypeEnum.PEAK) || rate.getRateType().equals(RateTypeEnum.PROMOTION))) {
-                        while (true) {
+                        LocalDate end = null;
+                        while (end==null || !end.isAfter(rate.getValidityStart())) {
                             System.out.print("End Period (YYYY-MM-DD) > ");
                             String endDate = scanner.nextLine().trim();
                             try {
-                                LocalDate localDate = LocalDate.parse(endDate);
-                                rate.setValidityEnd(localDate);
-                                break;
+                                end = LocalDate.parse(endDate);
+                                if (!end.isAfter(rate.getValidityStart())){
+                                    System.out.println("Error: End date must be after start date");
+                                    end=null;
+                                } else {
+                                    rate.setValidityEnd(end);
+                                    break;
+                                }
+                                
                             } catch (DateTimeParseException ex) {
                                 System.out.println("Error: Invalid Date");
                             }
@@ -895,7 +909,7 @@ public class HotelOperationModule {
 
             } catch (RateNotFoundException ex) {
                 System.out.println("Error: " + ex.getMessage());
-                System.out.println("Input Room Rate Id again");
+                System.out.println("Input Room Rate name again");
                 continue;
             }
         }
@@ -1026,10 +1040,33 @@ public class HotelOperationModule {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("*Walk In Search & Reserve Room*");
-        System.out.print("Enter Check-In Date (YYYY-MM-DD) > ");
-        LocalDate startDate = LocalDate.parse(scanner.nextLine().trim());
-        System.out.print("Enter Check-Out Date (YYYY-MM-DD) > ");
-        LocalDate endDate = LocalDate.parse(scanner.nextLine().trim());
+        LocalDate startDate = null;
+        String date = "";
+
+        while (startDate == null) {
+            System.out.print("Enter Check-In Date (YYYY-MM-DD) >");
+            date = scanner.nextLine().trim();
+            try {
+                startDate = LocalDate.parse(date);
+            } catch (DateTimeParseException ex) {
+                System.out.println("Error: Invalid date. Please enter check-in date again");
+            }
+        }
+
+        LocalDate endDate = null;
+        while (endDate == null || !endDate.isAfter(startDate)) {
+            System.out.print("Enter Check-Out Date (YYYY-MM-DD) > ");
+            date = scanner.nextLine().trim();
+            try {
+                endDate = LocalDate.parse(date);
+                if (!endDate.isAfter(startDate)){
+                    System.out.println("Error: Check-out date must be after the check-in date");
+                    endDate =null;
+                }
+            } catch (DateTimeParseException ex) {
+                System.out.println("Error: Invalid date");
+            }
+        }
 
         List<Pair<RoomType, Integer>> roomTypesAndNumber = roomAvailabilitySessionBean.getAvailableRoomTypeAndNumber(startDate, endDate);
         System.out.println("Available Room Types and Quantity");
@@ -1163,10 +1200,19 @@ public class HotelOperationModule {
     private void doAllocateRoomToCurrentDayReservation() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("*Allocate Room To Current Date Reservation*");
-        System.out.print("Current Date > ");
-        String date = scanner.nextLine().trim();
-        LocalDate currentDate = LocalDate.parse(date);
-
+        String date="";
+        LocalDate currentDate = null;
+        
+        while (currentDate==null){
+            System.out.print("Current Date > ");
+            date = scanner.nextLine().trim();
+            try {
+                currentDate = LocalDate.parse(date);
+            } catch (DateTimeParseException ex) {
+                System.out.println("Error: Invalid date. Please enter check-in date again");
+            }
+        }
+        
         roomAllocationSessionBean.allocateDailyReservation(currentDate);
         System.out.println("Allocated Rooms for " + date);
     }
