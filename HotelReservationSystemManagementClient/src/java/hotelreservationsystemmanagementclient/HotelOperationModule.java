@@ -622,7 +622,6 @@ public class HotelOperationModule {
                 System.out.print("Remove / Disable this Room? (y/n) > ");
                 String response = scanner.nextLine().trim();
                 if (response.equals("y")) {
-                    // TO-DO : Disable feature
                     roomSessionBean.deleteRoom(room.getRoomId());
                     System.out.println("Room " + room.getRoomNumber() + " deleted");
                 } else {

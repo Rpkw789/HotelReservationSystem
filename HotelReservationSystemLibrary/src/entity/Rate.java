@@ -89,7 +89,7 @@ public class Rate implements Serializable, Comparable<Rate> {
     }
 
     public boolean overlaps(LocalDate currentDate) {
-        if ((this.validityStart.isBefore(currentDate) || this.validityStart.equals(currentDate)) || (this.validityEnd.isAfter(currentDate) || this.validityEnd.equals(currentDate))) {
+        if ((this.validityStart.isBefore(currentDate) || this.validityStart.equals(currentDate)) && (this.validityEnd.isAfter(currentDate) || this.validityEnd.equals(currentDate))) {
             return true;
         }
         return false;
@@ -243,9 +243,9 @@ public class Rate implements Serializable, Comparable<Rate> {
     private int getPriorityValue() {
         if(rateType.equals(RateTypeEnum.PUBLISHED)) {
             return 4;
-        } else if(rateType.equals(RateTypeEnum.PEAK)) {
-            return 3;
         } else if(rateType.equals(RateTypeEnum.NORMAL)) {
+            return 3;
+        } else if(rateType.equals(RateTypeEnum.PEAK)) {
             return 2;
         } else {
             return 1;

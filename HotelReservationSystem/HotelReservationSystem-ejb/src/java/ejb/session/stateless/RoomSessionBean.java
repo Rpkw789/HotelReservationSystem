@@ -13,6 +13,8 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import util.enumeration.OperationalStatusEnum;
+import util.enumeration.RoomAvailabilityStatusEnum;
 import util.exception.RoomExistsException;
 import util.exception.RoomNotFoundException;
 
@@ -78,6 +80,11 @@ public class RoomSessionBean implements RoomSessionBeanRemote, RoomSessionBeanLo
         if (room == null) {
             throw new RoomNotFoundException("Room does not exist!");
         } else {
+            room.getRoomType().getRooms().remove(room);
+            if(room.getAvailabilityStatus().equals(RoomAvailabilityStatusEnum.NOT_AVAILABLE)) {
+                room.setOperationalStatus(OperationalStatusEnum.DISABLED);
+                return;
+            }
             em.remove(room);
         }
     }

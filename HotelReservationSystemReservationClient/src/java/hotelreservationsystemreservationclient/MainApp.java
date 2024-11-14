@@ -45,7 +45,7 @@ public class MainApp {
             System.out.println("***Welcome To Hotel Reservation System - Reservation Client***");
             System.out.println("1: Log-in");
             System.out.println("2: Register");
-            System.out.println("3: Exist");
+            System.out.println("3: Exit");
 
             int response = sc.nextInt();
 
