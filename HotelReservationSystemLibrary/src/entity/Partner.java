@@ -192,4 +192,18 @@ public class Partner implements Serializable {
         this.guests = guests;
     }
 
+    /**
+     * @return the role
+     */
+    public PartnerRoleEnum getRole() {
+        return role;
+    }
+
+    /**
+     * @param role the role to set
+     */
+    public void setRole(PartnerRoleEnum role) {
+        this.role = role;
+    }
+
 }

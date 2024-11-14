@@ -61,27 +61,30 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
         }
     }
     
+
     @Override
-    public Guest createPartnerAccount(Guest g) throws PartnerAccountExistsException {
+    public Long createPartnerAccount(Guest g, Long partnerId) throws PartnerAccountExistsException {
         if (isUniqueGuestUsername(g.getUsername())){
             em.persist(g);
             em.flush();
-            
-            return g;
+            Partner p = em.find(Partner.class, partnerId);
+            p.getGuests().add(g);
+            return g.getGuestId();
         } else {
             throw new PartnerAccountExistsException("Account with same username already exists!");     
         }
     }
     
     @Override
-    public void logInPartnerAccount(String username, String password) throws InvalidCredentialException{
+    public Long logInPartnerAccount(String username, String password) throws InvalidCredentialException{
        try {
            Guest g = guestSessionBean.getGuestByUsername(username);
            if (!g.getPassword().equals(password)) {
                throw new InvalidCredentialException("Password is not correct!");
            }
+           return g.getGuestId();
        } catch (GuestNotFoundException ex) {
-           ex.getMessage();
+           throw new InvalidCredentialException("Username is not correct!");
        }
     }
     
@@ -111,8 +114,10 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
         }
     }
     
+    @Override
     public List<Reservation> retrieveAllReservations(Partner p) {
-        List<Guest> guests = p.getGuests();
+        Partner partner = em.find(Partner.class, p.getPartnerId());
+        List<Guest> guests = partner.getGuests();
         List<Reservation> allReservations = new ArrayList<Reservation>();
         
         for (Guest g : guests){

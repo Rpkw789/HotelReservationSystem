@@ -65,6 +65,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         return reservation.getReservationId();
     }
 
+    @Override
     public Reservation getReservationById(Long reservationId) throws ReservationNotFoundException {
         Reservation reservation = em.find(Reservation.class, reservationId);
         if (reservation == null) {
