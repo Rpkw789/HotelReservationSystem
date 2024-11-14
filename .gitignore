@@ -77,3 +77,8 @@ nbproject/private/
 /*.jar
 /HolidayReservationSystemSeClient/nbproject/private/
 /HotelReservationSystem/HolidayReservationJavaSeClient/nbproject/private/
+
+HotelReservationSystem/nbproject/private/
+HolidayReservationSystem/nbproject/private/
+HotelReservationSystemManagementClient/nbproject/private/
+HotelReservationSystemReservationClient/nbproject/private/
