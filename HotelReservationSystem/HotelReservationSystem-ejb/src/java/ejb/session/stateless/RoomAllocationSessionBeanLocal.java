@@ -5,8 +5,10 @@
 package ejb.session.stateless;
 
 import entity.Reservation;
+import entity.RoomAllocationExceptionRecord;
 import entity.RoomType;
 import java.time.LocalDate;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -19,5 +21,7 @@ public interface RoomAllocationSessionBeanLocal {
     public void allocateWalkInRoom(RoomType roomType, Reservation reservation);
 
     public void allocateDailyReservation(LocalDate currentDate);
+
+    public List<RoomAllocationExceptionRecord> getRoomAllocationExceptionRecord(LocalDate date);
     
 }

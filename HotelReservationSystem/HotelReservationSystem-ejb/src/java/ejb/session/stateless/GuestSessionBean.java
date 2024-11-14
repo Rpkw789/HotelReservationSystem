@@ -84,6 +84,10 @@ public class GuestSessionBean implements GuestSessionBeanRemote, GuestSessionBea
 
         try {
             Guest guest = (Guest) query.getSingleResult();
+            guest.getReservations().size();
+            for (Reservation reservation : guest.getReservations()) {
+                reservation.getGivenRooms().size();
+            }
             return guest;
         } catch (NonUniqueResultException ex) {
             throw new GuestNotFoundException("Guest with passportNumber '" + passportNumber + "' not found");

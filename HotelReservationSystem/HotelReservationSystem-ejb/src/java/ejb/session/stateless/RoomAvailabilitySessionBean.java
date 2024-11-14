@@ -9,6 +9,7 @@ import entity.Reservation;
 import entity.RoomType;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -58,7 +59,7 @@ public class RoomAvailabilitySessionBean implements RoomAvailabilitySessionBeanR
 
             int totalRooms = (int) roomType.getRooms().stream().filter(r -> r.getOperationalStatus().equals(OperationalStatusEnum.ENABLED)).count();
             int minAvailableRooms = totalRooms;
-            System.out.println(roomType + ": " + roomAvailability);
+            System.out.println(roomType + ": " + Arrays.toString(roomAvailability));
             for (int roomsUsed : roomAvailability) {
                 minAvailableRooms = Math.min(minAvailableRooms, totalRooms - roomsUsed);
             }

@@ -123,5 +123,16 @@ public class RoomAllocationSessionBean implements RoomAllocationSessionBeanRemot
             }
         }
     }
+    
+    public List<RoomAllocationExceptionRecord> getRoomAllocationExceptionRecord(LocalDate date) {
+        Query query = em.createQuery("SELECT r FROM RoomAllocationExceptionRecord r WHERE r.date = :date");
+        query.setParameter("date", date);
+        List<RoomAllocationExceptionRecord> list = query.getResultList();
+        for(RoomAllocationExceptionRecord r : list) {
+            r.getAffectedReservation().getGivenRooms().size();
+            r.getAffectedReservation().getRoomType();
+        }
+        return list;
+    }
 
 }

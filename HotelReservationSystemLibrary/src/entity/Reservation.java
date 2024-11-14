@@ -51,18 +51,18 @@ public class Reservation implements Serializable {
     @NotNull
     @Min(1)
     private int numberOfRooms;
-    
+
     // Relationships
     @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
     private Guest guest;
-    
+
     @ManyToMany
     private List<Rate> rates = new ArrayList<Rate>();
-    
+
     @OneToMany(mappedBy = "reservation")
     private List<Room> givenRooms = new ArrayList<Room>();
-    
+
     @OneToOne(optional = false)
     @JoinColumn(nullable = false)
     private RoomType roomType;
@@ -79,14 +79,21 @@ public class Reservation implements Serializable {
         this.roomType = roomType;
         this.givenRooms = new ArrayList<Room>();
     }
-    
+
     public boolean overlaps(LocalDate startDate, LocalDate endDate) {
-        if(this.checkInDate.isAfter(endDate) || this.checkOutDate.isBefore(startDate)) {
+        if (this.checkInDate.isAfter(endDate) || this.checkOutDate.isBefore(startDate)) {
             return false;
         }
         return true;
     }
-    
+
+    public boolean overlaps(LocalDate currentDate) {
+        if ((this.checkInDate.isBefore(currentDate) || this.checkInDate.equals(currentDate)) || (this.checkOutDate.isAfter(currentDate) || this.checkOutDate.equals(currentDate))) {
+            return true;
+        }
+        return false;
+    }
+
     public Long getReservationId() {
         return reservationId;
     }
@@ -188,7 +195,6 @@ public class Reservation implements Serializable {
     public void setGuest(Guest guest) {
         this.guest = guest;
     }
-
 
     /**
      * @return the roomType
