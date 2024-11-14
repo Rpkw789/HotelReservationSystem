@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entity.Rate;
 import entity.Reservation;
+import entity.Room;
 import entity.RoomType;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -51,10 +52,24 @@ public class RoomAvailabilitySessionBean implements RoomAvailabilitySessionBeanR
                 LocalDate overlapStart = reservation.getCheckInDate().isBefore(checkInDate) ? checkInDate : reservation.getCheckInDate();
                 LocalDate overlapEnd = reservation.getCheckOutDate().isAfter(checkOutDate) ? checkOutDate : reservation.getCheckOutDate().minusDays(1);
 
-                for (LocalDate date = overlapStart; !date.isAfter(overlapEnd); date = date.plusDays(1)) {
-                    int index = date.compareTo(checkInDate);
-                    roomAvailability[index] += reservation.getNumberOfRooms();
+                if (reservation.isCheckedIn()) {
+                    for (LocalDate date = overlapStart; !date.isAfter(overlapEnd); date = date.plusDays(1)) {
+                        int index = date.compareTo(checkInDate);
+                        
+                        for(Room room : reservation.getGivenRooms()) {
+                            if(room.getRoomType().equals(roomType)) {
+                                roomAvailability[index] += 1;
+                            }
+                        }
+                        
+                    }
+                } else {
+                    for (LocalDate date = overlapStart; !date.isAfter(overlapEnd); date = date.plusDays(1)) {
+                        int index = date.compareTo(checkInDate);
+                        roomAvailability[index] += reservation.getNumberOfRooms();
+                    }
                 }
+
             }
 
             int totalRooms = (int) roomType.getRooms().stream().filter(r -> r.getOperationalStatus().equals(OperationalStatusEnum.ENABLED)).count();
@@ -87,14 +102,14 @@ public class RoomAvailabilitySessionBean implements RoomAvailabilitySessionBeanR
 
         List<Rate> usedRates = new ArrayList<Rate>();
         for (LocalDate date = checkInDate; !date.isAfter(checkOutDate.minusDays(1)); date = date.plusDays(1)) {
-            
+
             List<Rate> currentRates = new ArrayList<Rate>();
             for (Rate rate : rates) {
                 if (rate.overlaps(date)) {
                     currentRates.add(rate);
                 }
             }
-            
+
             currentRates.sort(null);
             usedRates.add(currentRates.get(currentRates.size() - 1));
         }
