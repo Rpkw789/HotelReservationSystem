@@ -522,6 +522,11 @@ public class HotelOperationModule {
         while (true) {
             System.out.print("Room Number > ");
             roomNumber = scanner.nextLine().trim();
+            
+            if(roomNumber.length() != 4) {
+                System.out.println("Error: Only 4 Characters Long allowed");
+                continue;
+            }
 
             if (roomSessionBean.isUniqueRoomNumber(roomNumber)) {
                 break;
