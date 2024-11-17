@@ -85,7 +85,7 @@ public class GuestModule {
         String date = "";
 
         while (startDate == null) {
-            System.out.print("Enter Check-In Date (YYYY-MM-DD) >");
+            System.out.print("Enter Check-In Date (YYYY-MM-DD) > ");
             date = scanner.nextLine().trim();
             try {
                 startDate = LocalDate.parse(date);

@@ -1171,7 +1171,7 @@ public class HotelOperationModule {
         Scanner scanner = new Scanner(System.in);
         System.out.println("");
         System.out.println("*Register*");
-        System.out.println("Please enter your name > ");
+        System.out.print("Please enter your name > ");
         String name = scanner.nextLine().trim();
 
         String username = "";
@@ -1207,12 +1207,12 @@ public class HotelOperationModule {
             }
         }
 
-        System.out.print("Please enter your email >");
+        System.out.print("Please enter your email > ");
         String email = scanner.nextLine().trim();
 
         String number;
         String phonePattern = "\\d+";
-        System.out.print("Please enter your phone number >");
+        System.out.print("Please enter your phone number > ");
         while (true) {
             number = scanner.nextLine().trim();
             if (Pattern.matches(phonePattern, number)) {

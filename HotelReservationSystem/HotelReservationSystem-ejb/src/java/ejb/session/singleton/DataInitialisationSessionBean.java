@@ -139,7 +139,7 @@ public class DataInitialisationSessionBean {
             rateSessionBean.createNewRate(r8);
             Rate r9 = new Rate("Grand Suite Published", 500, RateTypeEnum.PUBLISHED, grand);
             rateSessionBean.createNewRate(r9);
-            Rate r10 = new Rate("Grand Suite Published", 250, RateTypeEnum.NORMAL, grand);
+            Rate r10 = new Rate("Grand Suite Normal", 250, RateTypeEnum.NORMAL, grand);
             rateSessionBean.createNewRate(r10);
         } catch (RateExistsException ex) {
         }

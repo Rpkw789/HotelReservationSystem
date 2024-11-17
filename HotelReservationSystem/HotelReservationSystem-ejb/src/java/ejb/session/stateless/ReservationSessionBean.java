@@ -26,6 +26,9 @@ import util.exception.ReservationNotFoundException;
 public class ReservationSessionBean implements ReservationSessionBeanRemote, ReservationSessionBeanLocal {
 
     @EJB
+    private RoomAllocationSessionBeanLocal roomAllocationSessionBean;
+
+    @EJB
     private GuestSessionBeanLocal guestSessionBean;
 
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
@@ -65,6 +68,10 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
         guest.getReservations().add(reservation);
         reservation.getRoomType().getReservations().add(reservation);
+        
+        if(reservation.getCheckInDate().equals(LocalDate.now())) {
+            roomAllocationSessionBean.allocateDailyReservation(LocalDate.now());
+        }
         return reservation.getReservationId();
     }
 

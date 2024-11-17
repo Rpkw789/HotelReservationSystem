@@ -80,7 +80,6 @@ public class RoomAllocationSessionBean implements RoomAllocationSessionBeanRemot
                 }
                 reservationCounter++;
             }
-            
 
             // EXCEPTIONS
             List<RoomType> filteredRoomType = new ArrayList<RoomType>();
@@ -95,28 +94,27 @@ public class RoomAllocationSessionBean implements RoomAllocationSessionBeanRemot
                     int numberOfRoomsLeft = numberOfRooms - reservation.getGivenRooms().size();
 
                     RoomType unavailableRoomType = reservation.getRoomType();
-                    
+
                     outery:
                     for (int j = numberOfRoomsLeft; j > 0; j--) {
                         RoomType currentRoomType = unavailableRoomType;
-                        while (currentRoomType.getNextHigherRoomType() != null) {
-                            currentRoomType = currentRoomType.getNextHigherRoomType();
+                        currentRoomType = currentRoomType.getNextHigherRoomType();
 
-                            List<Room> roomsies = currentRoomType.getRooms();
-                            List<Room> updatedAvailableRooms = new ArrayList<Room>();
-                            roomsies.stream().filter(r -> r.getAvailabilityStatus().equals(RoomAvailabilityStatusEnum.AVAILABLE) && r.getReservation() == null).forEach(r -> updatedAvailableRooms.add(r));
+                        List<Room> roomsies = currentRoomType.getRooms();
+                        List<Room> updatedAvailableRooms = new ArrayList<Room>();
+                        roomsies.stream().filter(r -> r.getAvailabilityStatus().equals(RoomAvailabilityStatusEnum.AVAILABLE) && r.getReservation() == null).forEach(r -> updatedAvailableRooms.add(r));
 
-                            if (!updatedAvailableRooms.isEmpty()) {
-                                Room room = updatedAvailableRooms.get(0);
-                                room.setReservation(reservation);
-                                reservation.getGivenRooms().add(room);
-                                RoomAllocationExceptionRecord record = new RoomAllocationExceptionRecord(currentDate, "1 Room Upgraded From " + unavailableRoomType.getName() + " To " + currentRoomType.getName());
-                                record.setAffectedReservation(reservation);
-                                em.persist(record);
-                                numberOfRoomsLeft--;
-                                continue outery;
-                            }
+                        if (!updatedAvailableRooms.isEmpty()) {
+                            Room room = updatedAvailableRooms.get(0);
+                            room.setReservation(reservation);
+                            reservation.getGivenRooms().add(room);
+                            RoomAllocationExceptionRecord record = new RoomAllocationExceptionRecord(currentDate, "1 Room Upgraded From " + unavailableRoomType.getName() + " To " + currentRoomType.getName());
+                            record.setAffectedReservation(reservation);
+                            em.persist(record);
+                            numberOfRoomsLeft--;
+                            continue outery;
                         }
+
                         RoomAllocationExceptionRecord record = new RoomAllocationExceptionRecord(currentDate, "No Available Rooms for " + numberOfRoomsLeft + " Rooms");
                         record.setAffectedReservation(reservation);
                         em.persist(record);
@@ -126,13 +124,13 @@ public class RoomAllocationSessionBean implements RoomAllocationSessionBeanRemot
             }
         }
     }
-    
+
     @Override
     public List<RoomAllocationExceptionRecord> getRoomAllocationExceptionRecord(LocalDate date) {
         Query query = em.createQuery("SELECT r FROM RoomAllocationExceptionRecord r WHERE r.date = :date");
         query.setParameter("date", date);
         List<RoomAllocationExceptionRecord> list = query.getResultList();
-        for(RoomAllocationExceptionRecord r : list) {
+        for (RoomAllocationExceptionRecord r : list) {
             r.getAffectedReservation().getGivenRooms().size();
             r.getAffectedReservation().getRoomType();
         }
